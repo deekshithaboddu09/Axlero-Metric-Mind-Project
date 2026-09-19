@@ -216,3 +216,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Keep the reproducible project dataset tracked; ignore only local generated variants.
+data-*/
+data/**/__pycache__/

@@ -1,0 +1,13 @@
+department_id,department_name,division,office_city,manager_employee_id,annual_budget_usd
+D001,Executive,Corporate,New York,E00012,2511000.00
+D002,Finance,Corporate,New York,E00005,6650000.00
+D003,Human Resources,Corporate,Chicago,E00007,3184000.00
+D004,Sales,Revenue,Chicago,E00014,6447000.00
+D005,Marketing,Revenue,Austin,E00001,7490000.00
+D006,Customer Success,Revenue,Austin,E00003,5491000.00
+D007,Engineering,Technology,Seattle,E00018,1808000.00
+D008,Data & Analytics,Technology,Seattle,E00019,1925000.00
+D009,Product,Technology,San Francisco,E00025,7912000.00
+D010,Operations,Operations,Dallas,E00002,2423000.00
+D011,Legal,Corporate,New York,E00008,1268000.00
+D012,Procurement,Operations,Dallas,E00048,6110000.00

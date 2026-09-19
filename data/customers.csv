@@ -1,0 +1,451 @@
+customer_id,company_name,industry,customer_segment,billing_city,account_opened_date,customer_status
+C00001,Pioneer Group 001,Manufacturing,Mid-Market,Boston,2023-03-19,Active
+C00002,Westbridge Group 002,Retail,Enterprise,Seattle,2018-02-09,At Risk
+C00003,Summit Industries 003,Professional Services,Mid-Market,Portland,2024-06-23,Active
+C00004,BluePeak Systems 004,Manufacturing,Mid-Market,Austin,2023-06-25,At Risk
+C00005,Cloudline Group 005,Retail,SMB,San Diego,2024-09-10,Active
+C00006,Pioneer Partners 006,Professional Services,Mid-Market,Seattle,2020-12-14,Active
+C00007,Cloudline Industries 007,Professional Services,SMB,Portland,2024-06-30,Active
+C00008,Pioneer Partners 008,Retail,Mid-Market,Denver,2019-02-07,Active
+C00009,BluePeak Systems 009,Technology,SMB,Chicago,2021-11-06,Active
+C00010,Redwood Holdings 010,Retail,Mid-Market,Boston,2024-06-03,Active
+C00011,Lumen Partners 011,Financial Services,Enterprise,New York,2019-02-12,Active
+C00012,Northstar Partners 012,Financial Services,SMB,Portland,2018-05-26,Active
+C00013,Summit Systems 013,Financial Services,Enterprise,San Diego,2021-12-18,Active
+C00014,BluePeak Systems 014,Financial Services,SMB,Dallas,2024-07-12,Active
+C00015,HarborPoint Partners 015,Professional Services,Mid-Market,Phoenix,2018-05-19,Active
+C00016,HarborPoint Systems 016,Financial Services,Enterprise,Chicago,2020-10-17,Active
+C00017,Northstar Industries 017,Technology,SMB,Seattle,2022-12-31,At Risk
+C00018,HarborPoint Partners 018,Financial Services,SMB,Phoenix,2022-05-11,At Risk
+C00019,Northstar Partners 019,Professional Services,Mid-Market,Chicago,2019-03-21,Active
+C00020,Summit Industries 020,Retail,Mid-Market,New York,2023-05-19,Churned
+C00021,Lumen Group 021,Retail,Enterprise,Dallas,2021-11-25,Active
+C00022,Cloudline Partners 022,Manufacturing,SMB,Boston,2021-06-18,At Risk
+C00023,Evergreen Industries 023,Manufacturing,Mid-Market,Chicago,2018-03-05,Active
+C00024,CedarWorks Group 024,Financial Services,Mid-Market,Boston,2022-04-15,Active
+C00025,BluePeak Systems 025,Manufacturing,Enterprise,Boston,2023-06-13,Active
+C00026,Pioneer Systems 026,Manufacturing,Mid-Market,Dallas,2024-05-05,Active
+C00027,CedarWorks Holdings 027,Financial Services,Mid-Market,Phoenix,2021-11-20,Active
+C00028,Ironwood Group 028,Manufacturing,SMB,Phoenix,2020-11-19,Active
+C00029,Lumen Systems 029,Manufacturing,Mid-Market,Portland,2019-02-10,Active
+C00030,HarborPoint Group 030,Financial Services,Enterprise,Denver,2024-05-21,Active
+C00031,CedarWorks Partners 031,Technology,Mid-Market,Chicago,2024-05-27,Churned
+C00032,Summit Partners 032,Financial Services,Mid-Market,Boston,2018-09-08,Active
+C00033,Evergreen Systems 033,Technology,Mid-Market,Phoenix,2018-03-09,Active
+C00034,Redwood Holdings 034,Technology,Mid-Market,Chicago,2020-10-05,Active
+C00035,Summit Partners 035,Healthcare,SMB,Boston,2019-11-06,Active
+C00036,Westbridge Systems 036,Manufacturing,SMB,San Diego,2019-11-07,Active
+C00037,Redwood Industries 037,Financial Services,Mid-Market,San Diego,2018-03-31,Active
+C00038,Redwood Holdings 038,Technology,SMB,Seattle,2024-10-17,At Risk
+C00039,Westbridge Holdings 039,Retail,SMB,Phoenix,2021-09-27,Active
+C00040,Lumen Industries 040,Technology,Enterprise,New York,2023-11-19,Active
+C00041,Westbridge Partners 041,Healthcare,Enterprise,Boston,2021-03-10,Active
+C00042,Evergreen Systems 042,Financial Services,Mid-Market,Boston,2018-10-05,At Risk
+C00043,Ironwood Group 043,Retail,Enterprise,New York,2022-11-19,Active
+C00044,Pioneer Holdings 044,Professional Services,SMB,Portland,2023-02-11,Active
+C00045,CedarWorks Group 045,Financial Services,Mid-Market,Portland,2019-05-14,Active
+C00046,BluePeak Partners 046,Retail,SMB,Denver,2019-10-15,Active
+C00047,HarborPoint Systems 047,Professional Services,Mid-Market,Dallas,2020-10-07,Active
+C00048,Ironwood Group 048,Healthcare,Mid-Market,Seattle,2022-01-02,At Risk
+C00049,Ironwood Group 049,Professional Services,Mid-Market,Chicago,2019-09-06,Active
+C00050,Lumen Systems 050,Professional Services,Mid-Market,Phoenix,2020-03-16,Active
+C00051,Pioneer Partners 051,Financial Services,SMB,San Diego,2023-09-17,Active
+C00052,Summit Industries 052,Healthcare,SMB,New York,2023-10-15,Active
+C00053,Cloudline Holdings 053,Retail,Mid-Market,Portland,2023-12-13,At Risk
+C00054,CedarWorks Group 054,Retail,SMB,Portland,2020-08-30,Active
+C00055,Northstar Systems 055,Professional Services,Mid-Market,Portland,2023-07-29,Active
+C00056,Cloudline Industries 056,Financial Services,SMB,Phoenix,2019-04-08,Active
+C00057,HarborPoint Holdings 057,Manufacturing,Mid-Market,Chicago,2019-10-27,At Risk
+C00058,Redwood Industries 058,Healthcare,Mid-Market,Austin,2023-05-05,Active
+C00059,Redwood Systems 059,Technology,SMB,Seattle,2023-08-01,Active
+C00060,Pioneer Partners 060,Financial Services,SMB,Denver,2023-07-03,Active
+C00061,Evergreen Industries 061,Technology,SMB,San Diego,2021-04-14,Active
+C00062,Cloudline Partners 062,Retail,SMB,Phoenix,2021-05-21,Active
+C00063,Summit Industries 063,Professional Services,Mid-Market,Denver,2018-08-14,Active
+C00064,Redwood Holdings 064,Professional Services,Mid-Market,Dallas,2021-10-24,Active
+C00065,Redwood Partners 065,Financial Services,Enterprise,Dallas,2022-01-19,Active
+C00066,Cloudline Systems 066,Financial Services,Mid-Market,Portland,2018-08-06,Active
+C00067,CedarWorks Holdings 067,Professional Services,SMB,Boston,2018-04-02,Active
+C00068,Ironwood Partners 068,Financial Services,Mid-Market,Denver,2022-07-19,At Risk
+C00069,Ironwood Systems 069,Technology,Mid-Market,Boston,2024-04-06,At Risk
+C00070,Ironwood Industries 070,Professional Services,Mid-Market,Portland,2022-06-19,Active
+C00071,Northstar Group 071,Technology,SMB,Seattle,2020-02-04,Active
+C00072,CedarWorks Systems 072,Retail,SMB,New York,2021-03-21,Active
+C00073,Redwood Industries 073,Professional Services,Mid-Market,Seattle,2024-07-04,Active
+C00074,Ironwood Holdings 074,Retail,Mid-Market,Denver,2023-05-12,Active
+C00075,Summit Group 075,Professional Services,Mid-Market,Chicago,2022-09-24,Churned
+C00076,Ironwood Holdings 076,Retail,Mid-Market,Austin,2018-02-02,At Risk
+C00077,Westbridge Holdings 077,Healthcare,SMB,San Diego,2021-04-28,Active
+C00078,Cloudline Partners 078,Financial Services,SMB,San Diego,2019-07-19,Active
+C00079,Westbridge Group 079,Manufacturing,Mid-Market,Chicago,2020-09-22,Active
+C00080,Westbridge Partners 080,Retail,Mid-Market,Portland,2022-11-16,Active
+C00081,Redwood Systems 081,Technology,Enterprise,San Diego,2022-10-31,Active
+C00082,Westbridge Holdings 082,Technology,Mid-Market,Seattle,2019-12-20,Churned
+C00083,Pioneer Systems 083,Financial Services,SMB,Chicago,2022-02-04,Active
+C00084,Summit Group 084,Technology,Mid-Market,Chicago,2024-08-24,Active
+C00085,Ironwood Partners 085,Financial Services,SMB,Austin,2024-01-07,Active
+C00086,Northstar Partners 086,Manufacturing,SMB,Dallas,2022-08-21,Active
+C00087,Evergreen Holdings 087,Professional Services,SMB,Seattle,2024-06-25,Active
+C00088,Summit Holdings 088,Financial Services,Mid-Market,Seattle,2024-01-28,Active
+C00089,Redwood Holdings 089,Financial Services,Mid-Market,Dallas,2020-04-15,Churned
+C00090,Redwood Group 090,Professional Services,Enterprise,Seattle,2022-03-31,Active
+C00091,Ironwood Industries 091,Retail,SMB,Chicago,2018-10-24,Active
+C00092,CedarWorks Industries 092,Manufacturing,Enterprise,New York,2020-04-12,Active
+C00093,Summit Industries 093,Financial Services,Mid-Market,Seattle,2021-12-18,Active
+C00094,Redwood Industries 094,Financial Services,Mid-Market,Boston,2020-11-03,Active
+C00095,Pioneer Systems 095,Healthcare,Mid-Market,New York,2018-03-04,At Risk
+C00096,BluePeak Systems 096,Manufacturing,Mid-Market,Chicago,2020-09-09,Active
+C00097,BluePeak Systems 097,Retail,SMB,Denver,2020-02-06,Active
+C00098,CedarWorks Industries 098,Technology,Mid-Market,Denver,2020-05-21,Active
+C00099,Pioneer Holdings 099,Retail,Mid-Market,Chicago,2024-03-05,At Risk
+C00100,Northstar Partners 100,Healthcare,Mid-Market,Chicago,2019-09-23,Active
+C00101,Westbridge Industries 101,Manufacturing,Mid-Market,Austin,2021-07-18,Active
+C00102,CedarWorks Systems 102,Retail,SMB,Seattle,2024-05-01,Active
+C00103,Pioneer Partners 103,Retail,SMB,Dallas,2020-04-28,Active
+C00104,Cloudline Systems 104,Retail,Mid-Market,Chicago,2020-01-28,Active
+C00105,CedarWorks Industries 105,Financial Services,Enterprise,Austin,2022-06-01,Active
+C00106,Evergreen Industries 106,Professional Services,Mid-Market,Chicago,2022-09-09,Active
+C00107,BluePeak Group 107,Technology,Enterprise,Boston,2018-09-01,Active
+C00108,Ironwood Industries 108,Retail,Enterprise,Austin,2019-06-21,Active
+C00109,Northstar Systems 109,Healthcare,Mid-Market,Portland,2021-01-09,Active
+C00110,Lumen Industries 110,Retail,Mid-Market,Denver,2020-05-10,Active
+C00111,Redwood Group 111,Retail,Enterprise,Boston,2024-02-05,Active
+C00112,Westbridge Systems 112,Manufacturing,Enterprise,New York,2019-11-15,Active
+C00113,Northstar Holdings 113,Manufacturing,Enterprise,Boston,2018-03-04,Active
+C00114,Lumen Industries 114,Technology,Mid-Market,Portland,2019-11-19,Active
+C00115,Westbridge Group 115,Manufacturing,SMB,Chicago,2023-08-06,Active
+C00116,Northstar Holdings 116,Retail,Mid-Market,Portland,2021-07-02,Active
+C00117,BluePeak Industries 117,Professional Services,Enterprise,Denver,2022-09-18,Active
+C00118,Lumen Group 118,Technology,SMB,Phoenix,2024-04-11,Active
+C00119,Evergreen Holdings 119,Retail,Mid-Market,San Diego,2019-09-21,Active
+C00120,Lumen Partners 120,Manufacturing,Enterprise,Dallas,2023-03-07,Active
+C00121,HarborPoint Holdings 121,Professional Services,Mid-Market,New York,2024-04-03,Active
+C00122,Lumen Systems 122,Technology,SMB,Denver,2021-08-23,Active
+C00123,Redwood Group 123,Financial Services,SMB,Portland,2021-01-29,Active
+C00124,Evergreen Systems 124,Professional Services,Mid-Market,San Diego,2018-04-02,Active
+C00125,Northstar Industries 125,Manufacturing,Mid-Market,Denver,2023-08-30,Active
+C00126,Lumen Industries 126,Financial Services,Enterprise,Denver,2018-05-01,Active
+C00127,Lumen Group 127,Retail,Mid-Market,Austin,2023-09-08,Churned
+C00128,Summit Holdings 128,Retail,Mid-Market,Austin,2019-12-14,Active
+C00129,Redwood Industries 129,Manufacturing,Enterprise,San Diego,2021-07-30,Active
+C00130,HarborPoint Group 130,Technology,Mid-Market,Seattle,2021-10-04,Active
+C00131,Northstar Systems 131,Professional Services,Enterprise,Chicago,2022-12-29,Active
+C00132,Northstar Holdings 132,Technology,Mid-Market,Chicago,2022-12-17,Active
+C00133,Pioneer Systems 133,Professional Services,SMB,San Diego,2018-06-04,Churned
+C00134,Summit Group 134,Professional Services,Mid-Market,Seattle,2021-03-14,At Risk
+C00135,CedarWorks Industries 135,Technology,Enterprise,New York,2023-12-30,Active
+C00136,Cloudline Systems 136,Healthcare,SMB,Denver,2024-08-31,Active
+C00137,Cloudline Industries 137,Financial Services,Mid-Market,Seattle,2019-07-14,At Risk
+C00138,CedarWorks Holdings 138,Technology,SMB,Denver,2020-11-26,Active
+C00139,Redwood Industries 139,Healthcare,SMB,Austin,2022-03-18,Active
+C00140,BluePeak Systems 140,Professional Services,SMB,Austin,2024-02-16,Active
+C00141,Ironwood Group 141,Financial Services,Mid-Market,Portland,2018-10-01,Active
+C00142,BluePeak Partners 142,Technology,SMB,New York,2021-05-16,Active
+C00143,Redwood Group 143,Retail,SMB,San Diego,2018-07-11,Active
+C00144,CedarWorks Partners 144,Professional Services,Mid-Market,Denver,2019-12-21,Active
+C00145,CedarWorks Industries 145,Healthcare,SMB,New York,2024-01-27,Active
+C00146,Evergreen Holdings 146,Technology,SMB,Seattle,2019-04-05,At Risk
+C00147,Westbridge Systems 147,Professional Services,Mid-Market,Denver,2022-03-31,Active
+C00148,Evergreen Group 148,Retail,Mid-Market,New York,2020-08-05,Active
+C00149,BluePeak Industries 149,Professional Services,SMB,Denver,2019-07-31,At Risk
+C00150,Evergreen Holdings 150,Retail,SMB,Phoenix,2022-12-06,Active
+C00151,HarborPoint Systems 151,Retail,SMB,Denver,2022-11-21,Active
+C00152,Ironwood Systems 152,Manufacturing,Mid-Market,San Diego,2024-03-05,Active
+C00153,Westbridge Holdings 153,Retail,SMB,Austin,2019-09-17,At Risk
+C00154,CedarWorks Systems 154,Healthcare,Mid-Market,San Diego,2020-09-13,Active
+C00155,Cloudline Group 155,Healthcare,Mid-Market,Portland,2019-09-06,Active
+C00156,HarborPoint Partners 156,Professional Services,Enterprise,Seattle,2018-02-10,Churned
+C00157,Summit Holdings 157,Healthcare,SMB,Boston,2018-04-06,Active
+C00158,Westbridge Holdings 158,Professional Services,Mid-Market,Austin,2019-11-09,Churned
+C00159,Redwood Partners 159,Professional Services,Mid-Market,Dallas,2021-02-05,Active
+C00160,Lumen Group 160,Manufacturing,Mid-Market,San Diego,2019-02-27,Active
+C00161,BluePeak Industries 161,Retail,Mid-Market,Phoenix,2018-04-14,Active
+C00162,Evergreen Industries 162,Healthcare,SMB,Denver,2019-07-31,Active
+C00163,Westbridge Industries 163,Retail,Enterprise,Boston,2022-05-18,Active
+C00164,Cloudline Systems 164,Retail,Mid-Market,Dallas,2021-07-22,Active
+C00165,Lumen Group 165,Retail,Mid-Market,Boston,2024-08-25,Active
+C00166,Ironwood Holdings 166,Professional Services,SMB,New York,2020-05-19,Active
+C00167,BluePeak Holdings 167,Manufacturing,SMB,Phoenix,2018-05-26,Active
+C00168,Westbridge Partners 168,Professional Services,Enterprise,Denver,2019-08-13,Active
+C00169,CedarWorks Partners 169,Professional Services,Mid-Market,New York,2024-02-17,At Risk
+C00170,Summit Partners 170,Financial Services,SMB,Seattle,2018-04-08,Active
+C00171,HarborPoint Partners 171,Professional Services,Mid-Market,Phoenix,2023-05-29,Active
+C00172,Ironwood Partners 172,Healthcare,Mid-Market,Dallas,2020-11-19,Active
+C00173,Ironwood Group 173,Retail,SMB,Chicago,2018-12-31,Active
+C00174,Summit Systems 174,Technology,Enterprise,Seattle,2021-06-29,Active
+C00175,Westbridge Industries 175,Manufacturing,Mid-Market,Chicago,2023-07-06,Active
+C00176,Westbridge Industries 176,Manufacturing,SMB,Austin,2018-12-31,Active
+C00177,Pioneer Partners 177,Healthcare,Enterprise,Boston,2020-02-28,At Risk
+C00178,Evergreen Group 178,Professional Services,Enterprise,Denver,2023-01-07,Active
+C00179,Lumen Group 179,Healthcare,SMB,Boston,2018-07-04,Active
+C00180,Westbridge Group 180,Healthcare,SMB,Portland,2023-10-02,Active
+C00181,Summit Partners 181,Manufacturing,Mid-Market,Phoenix,2019-05-28,At Risk
+C00182,Westbridge Industries 182,Manufacturing,Mid-Market,Chicago,2020-01-07,Active
+C00183,Northstar Holdings 183,Professional Services,Mid-Market,Phoenix,2018-04-04,Active
+C00184,Lumen Group 184,Retail,Mid-Market,Austin,2021-08-03,At Risk
+C00185,BluePeak Partners 185,Technology,Enterprise,San Diego,2024-09-15,Churned
+C00186,Westbridge Systems 186,Professional Services,Mid-Market,San Diego,2019-04-16,Churned
+C00187,Redwood Systems 187,Professional Services,SMB,Denver,2018-03-07,Active
+C00188,Ironwood Industries 188,Retail,SMB,New York,2022-02-18,Active
+C00189,Cloudline Holdings 189,Manufacturing,Mid-Market,Chicago,2019-05-12,Active
+C00190,CedarWorks Industries 190,Financial Services,Mid-Market,Denver,2024-02-03,Active
+C00191,Evergreen Systems 191,Professional Services,SMB,Dallas,2024-09-23,Active
+C00192,CedarWorks Partners 192,Retail,Mid-Market,Austin,2023-06-28,Active
+C00193,CedarWorks Partners 193,Professional Services,SMB,Chicago,2018-09-29,Active
+C00194,Cloudline Systems 194,Professional Services,SMB,Chicago,2019-06-24,Active
+C00195,CedarWorks Holdings 195,Retail,SMB,San Diego,2021-04-29,Active
+C00196,Cloudline Systems 196,Professional Services,SMB,Austin,2022-01-16,Active
+C00197,Redwood Group 197,Retail,Mid-Market,Denver,2019-03-23,Active
+C00198,Westbridge Holdings 198,Retail,Mid-Market,Seattle,2020-02-29,Active
+C00199,Northstar Holdings 199,Healthcare,Mid-Market,Austin,2023-11-06,Active
+C00200,HarborPoint Partners 200,Retail,Enterprise,Boston,2020-11-16,Active
+C00201,Summit Systems 201,Financial Services,Mid-Market,Boston,2022-03-18,Active
+C00202,Lumen Partners 202,Healthcare,Enterprise,Denver,2019-09-16,Active
+C00203,Cloudline Group 203,Financial Services,Mid-Market,Boston,2024-10-06,Active
+C00204,Pioneer Partners 204,Financial Services,SMB,Chicago,2018-12-08,Active
+C00205,Cloudline Industries 205,Technology,SMB,Boston,2024-05-26,Active
+C00206,Ironwood Holdings 206,Technology,SMB,Portland,2023-03-02,Active
+C00207,Evergreen Group 207,Retail,Enterprise,Dallas,2020-03-30,At Risk
+C00208,Summit Systems 208,Healthcare,Mid-Market,Dallas,2022-10-23,Active
+C00209,Ironwood Partners 209,Retail,Enterprise,Chicago,2018-02-11,Active
+C00210,BluePeak Systems 210,Financial Services,SMB,Chicago,2024-10-26,Active
+C00211,Ironwood Partners 211,Technology,Mid-Market,Boston,2018-01-02,Active
+C00212,Pioneer Systems 212,Manufacturing,SMB,New York,2019-01-07,Active
+C00213,Westbridge Industries 213,Financial Services,Mid-Market,Boston,2022-02-23,Active
+C00214,Evergreen Systems 214,Financial Services,SMB,Seattle,2020-09-14,Active
+C00215,Evergreen Holdings 215,Financial Services,Mid-Market,Dallas,2024-03-19,Active
+C00216,Lumen Group 216,Manufacturing,Enterprise,Seattle,2023-09-09,Active
+C00217,Westbridge Group 217,Healthcare,Mid-Market,Portland,2021-05-22,Active
+C00218,Ironwood Systems 218,Professional Services,SMB,Dallas,2019-03-18,Active
+C00219,HarborPoint Industries 219,Manufacturing,Enterprise,Portland,2022-04-19,Active
+C00220,Northstar Industries 220,Technology,SMB,Phoenix,2018-02-22,At Risk
+C00221,Redwood Holdings 221,Retail,Mid-Market,New York,2020-01-12,Active
+C00222,Lumen Systems 222,Financial Services,Mid-Market,Boston,2019-11-26,Active
+C00223,CedarWorks Partners 223,Retail,Mid-Market,Austin,2021-08-26,Active
+C00224,Ironwood Holdings 224,Retail,Mid-Market,Phoenix,2022-03-18,Active
+C00225,Pioneer Group 225,Technology,Mid-Market,Boston,2019-06-30,Active
+C00226,Westbridge Partners 226,Healthcare,SMB,Seattle,2023-03-06,Active
+C00227,Northstar Group 227,Technology,Mid-Market,Chicago,2024-03-12,Active
+C00228,Northstar Group 228,Professional Services,Enterprise,New York,2024-07-15,Active
+C00229,Cloudline Group 229,Healthcare,SMB,San Diego,2020-12-16,Active
+C00230,Summit Holdings 230,Professional Services,SMB,New York,2020-10-06,At Risk
+C00231,CedarWorks Systems 231,Retail,Enterprise,Dallas,2021-01-13,Active
+C00232,Lumen Group 232,Healthcare,SMB,Denver,2018-08-01,At Risk
+C00233,Cloudline Holdings 233,Manufacturing,Mid-Market,Chicago,2024-09-11,Active
+C00234,Pioneer Industries 234,Financial Services,SMB,Denver,2018-07-16,Active
+C00235,Northstar Partners 235,Manufacturing,Enterprise,San Diego,2018-03-07,Active
+C00236,CedarWorks Systems 236,Professional Services,SMB,Portland,2021-01-09,Active
+C00237,Lumen Systems 237,Healthcare,Mid-Market,Portland,2021-03-19,At Risk
+C00238,HarborPoint Partners 238,Retail,SMB,Boston,2023-06-01,Active
+C00239,Westbridge Partners 239,Manufacturing,SMB,Denver,2020-06-09,Active
+C00240,HarborPoint Industries 240,Retail,Mid-Market,New York,2019-11-03,Active
+C00241,Summit Partners 241,Manufacturing,Mid-Market,Phoenix,2021-04-02,Active
+C00242,Lumen Systems 242,Technology,Mid-Market,Chicago,2023-01-11,Churned
+C00243,Redwood Group 243,Professional Services,Enterprise,Portland,2022-04-14,Churned
+C00244,Redwood Systems 244,Financial Services,SMB,Dallas,2019-01-10,At Risk
+C00245,BluePeak Group 245,Technology,SMB,Denver,2024-01-22,At Risk
+C00246,Cloudline Industries 246,Technology,SMB,Phoenix,2022-12-04,Active
+C00247,Northstar Group 247,Healthcare,Mid-Market,New York,2019-08-27,Active
+C00248,Northstar Group 248,Retail,Mid-Market,Denver,2021-11-30,Active
+C00249,BluePeak Systems 249,Healthcare,Enterprise,Austin,2020-12-04,Churned
+C00250,Summit Industries 250,Professional Services,Mid-Market,Portland,2020-05-10,Churned
+C00251,Evergreen Group 251,Retail,Enterprise,Austin,2022-09-30,Active
+C00252,Redwood Partners 252,Financial Services,Mid-Market,San Diego,2024-08-03,Active
+C00253,Redwood Systems 253,Manufacturing,SMB,Austin,2018-07-04,Active
+C00254,Pioneer Holdings 254,Professional Services,SMB,Denver,2020-04-30,Active
+C00255,HarborPoint Partners 255,Financial Services,SMB,Phoenix,2023-12-10,Active
+C00256,Evergreen Holdings 256,Technology,Mid-Market,New York,2024-07-24,At Risk
+C00257,Redwood Systems 257,Manufacturing,SMB,Boston,2024-04-21,Active
+C00258,Summit Group 258,Technology,Mid-Market,Seattle,2024-07-27,Active
+C00259,Evergreen Holdings 259,Professional Services,Mid-Market,Phoenix,2020-08-02,Active
+C00260,Northstar Systems 260,Technology,Mid-Market,Dallas,2019-02-18,Active
+C00261,Redwood Holdings 261,Technology,SMB,Boston,2018-05-12,Active
+C00262,BluePeak Industries 262,Technology,SMB,Denver,2022-01-15,Active
+C00263,BluePeak Systems 263,Retail,Mid-Market,Portland,2024-05-05,Active
+C00264,BluePeak Group 264,Manufacturing,Mid-Market,Austin,2021-12-10,Active
+C00265,HarborPoint Partners 265,Retail,Mid-Market,Phoenix,2023-07-18,Active
+C00266,Summit Group 266,Healthcare,SMB,San Diego,2021-05-18,Active
+C00267,Pioneer Partners 267,Technology,SMB,Chicago,2019-02-23,Active
+C00268,Redwood Systems 268,Healthcare,Mid-Market,New York,2020-04-02,Active
+C00269,Redwood Partners 269,Manufacturing,SMB,New York,2018-06-24,Active
+C00270,Evergreen Holdings 270,Financial Services,Mid-Market,Phoenix,2020-09-20,Active
+C00271,Ironwood Holdings 271,Manufacturing,Mid-Market,San Diego,2024-02-18,Active
+C00272,Redwood Industries 272,Financial Services,SMB,Denver,2020-04-06,Active
+C00273,Northstar Industries 273,Technology,Enterprise,San Diego,2023-10-05,Active
+C00274,Northstar Partners 274,Healthcare,SMB,Seattle,2018-05-02,Active
+C00275,Summit Systems 275,Manufacturing,Mid-Market,New York,2024-05-27,Active
+C00276,Ironwood Group 276,Retail,SMB,Denver,2023-01-08,Active
+C00277,Evergreen Industries 277,Healthcare,Mid-Market,Boston,2021-07-16,Active
+C00278,HarborPoint Industries 278,Financial Services,SMB,New York,2021-02-15,Active
+C00279,Lumen Holdings 279,Manufacturing,Enterprise,Seattle,2024-09-29,Active
+C00280,Redwood Holdings 280,Financial Services,Mid-Market,Denver,2023-07-01,Active
+C00281,Ironwood Partners 281,Professional Services,SMB,Austin,2024-09-06,Active
+C00282,Evergreen Group 282,Technology,SMB,Austin,2022-01-10,Active
+C00283,CedarWorks Partners 283,Professional Services,Mid-Market,Chicago,2022-06-26,Active
+C00284,Northstar Group 284,Manufacturing,SMB,Boston,2019-05-10,At Risk
+C00285,Redwood Group 285,Healthcare,Enterprise,Seattle,2024-09-22,Churned
+C00286,Westbridge Industries 286,Healthcare,Mid-Market,San Diego,2019-08-22,Active
+C00287,Redwood Holdings 287,Financial Services,Enterprise,Dallas,2023-03-07,Active
+C00288,Evergreen Partners 288,Healthcare,SMB,Phoenix,2019-02-16,Active
+C00289,CedarWorks Industries 289,Healthcare,Mid-Market,San Diego,2020-10-18,Active
+C00290,BluePeak Partners 290,Financial Services,Mid-Market,Dallas,2018-04-07,Active
+C00291,Ironwood Group 291,Healthcare,SMB,New York,2018-11-18,Active
+C00292,Pioneer Industries 292,Technology,Enterprise,Chicago,2019-04-07,Active
+C00293,Ironwood Systems 293,Manufacturing,Enterprise,Portland,2020-05-01,Active
+C00294,Cloudline Systems 294,Retail,SMB,New York,2021-04-06,Active
+C00295,Cloudline Partners 295,Professional Services,SMB,New York,2020-10-04,Active
+C00296,Ironwood Systems 296,Technology,Mid-Market,Austin,2022-01-24,At Risk
+C00297,Summit Group 297,Manufacturing,Mid-Market,Phoenix,2021-07-15,Active
+C00298,Westbridge Systems 298,Retail,SMB,Chicago,2023-05-06,Active
+C00299,Northstar Group 299,Financial Services,Enterprise,New York,2018-01-07,Churned
+C00300,Summit Holdings 300,Technology,Mid-Market,Chicago,2021-01-14,Active
+C00301,Ironwood Partners 301,Financial Services,Mid-Market,San Diego,2021-10-07,Active
+C00302,Lumen Industries 302,Healthcare,Enterprise,Phoenix,2020-06-18,Active
+C00303,Cloudline Systems 303,Manufacturing,Enterprise,San Diego,2023-04-27,Active
+C00304,Northstar Group 304,Healthcare,SMB,Phoenix,2019-10-09,Active
+C00305,Redwood Partners 305,Retail,Mid-Market,Dallas,2020-07-09,Active
+C00306,BluePeak Systems 306,Manufacturing,Mid-Market,Phoenix,2020-07-18,Active
+C00307,Evergreen Partners 307,Retail,Enterprise,Boston,2024-05-26,Active
+C00308,Redwood Holdings 308,Retail,SMB,Boston,2021-07-10,Active
+C00309,Redwood Holdings 309,Retail,Mid-Market,Chicago,2024-08-26,Active
+C00310,Cloudline Partners 310,Technology,SMB,Chicago,2023-03-21,Active
+C00311,Lumen Partners 311,Healthcare,Mid-Market,Seattle,2018-02-17,Active
+C00312,Ironwood Holdings 312,Financial Services,SMB,Denver,2022-11-09,Active
+C00313,Lumen Industries 313,Healthcare,Enterprise,Boston,2021-07-19,Active
+C00314,BluePeak Partners 314,Manufacturing,SMB,Austin,2021-10-24,Active
+C00315,Cloudline Group 315,Manufacturing,SMB,Seattle,2023-10-16,Active
+C00316,Pioneer Industries 316,Manufacturing,Enterprise,Denver,2024-04-13,Active
+C00317,Westbridge Industries 317,Manufacturing,Mid-Market,New York,2022-10-31,Active
+C00318,Lumen Group 318,Professional Services,Mid-Market,Austin,2023-09-18,Active
+C00319,Westbridge Systems 319,Manufacturing,Enterprise,Boston,2022-12-20,Active
+C00320,Redwood Partners 320,Manufacturing,Enterprise,Austin,2019-09-11,Active
+C00321,Northstar Systems 321,Professional Services,SMB,New York,2019-09-07,Active
+C00322,Cloudline Industries 322,Manufacturing,Enterprise,Denver,2021-09-14,Active
+C00323,Northstar Group 323,Professional Services,Mid-Market,Chicago,2020-03-31,At Risk
+C00324,Ironwood Industries 324,Manufacturing,SMB,Seattle,2021-12-22,At Risk
+C00325,CedarWorks Partners 325,Technology,SMB,Boston,2020-03-15,Active
+C00326,BluePeak Group 326,Professional Services,Mid-Market,Phoenix,2020-08-05,Active
+C00327,Evergreen Partners 327,Financial Services,Mid-Market,Portland,2019-08-22,Active
+C00328,Evergreen Industries 328,Technology,Mid-Market,Austin,2019-01-27,Active
+C00329,HarborPoint Holdings 329,Professional Services,Mid-Market,San Diego,2022-07-06,Active
+C00330,Lumen Group 330,Financial Services,Mid-Market,Dallas,2024-09-02,Active
+C00331,Northstar Holdings 331,Professional Services,SMB,Phoenix,2019-02-01,Churned
+C00332,Ironwood Group 332,Healthcare,SMB,San Diego,2024-09-16,Active
+C00333,HarborPoint Partners 333,Manufacturing,Mid-Market,Chicago,2023-08-15,Active
+C00334,BluePeak Industries 334,Retail,Enterprise,Denver,2022-02-23,Active
+C00335,Pioneer Industries 335,Retail,Mid-Market,Denver,2023-02-21,Active
+C00336,Ironwood Holdings 336,Manufacturing,SMB,Dallas,2018-06-04,Active
+C00337,Redwood Systems 337,Manufacturing,Mid-Market,Boston,2021-11-22,Active
+C00338,Westbridge Holdings 338,Professional Services,Mid-Market,San Diego,2022-03-29,Active
+C00339,Evergreen Systems 339,Professional Services,Mid-Market,Denver,2024-04-26,Active
+C00340,Pioneer Industries 340,Financial Services,Enterprise,Denver,2022-11-18,Active
+C00341,Pioneer Holdings 341,Retail,SMB,Seattle,2023-10-12,Active
+C00342,Westbridge Partners 342,Financial Services,SMB,San Diego,2022-11-03,Active
+C00343,Northstar Industries 343,Manufacturing,Mid-Market,Chicago,2022-10-18,Active
+C00344,Lumen Industries 344,Technology,SMB,Dallas,2022-07-31,Active
+C00345,Evergreen Holdings 345,Retail,Mid-Market,Chicago,2021-04-11,Active
+C00346,HarborPoint Holdings 346,Professional Services,SMB,Chicago,2022-09-27,Active
+C00347,Northstar Holdings 347,Financial Services,SMB,Boston,2021-05-02,Active
+C00348,CedarWorks Group 348,Healthcare,Mid-Market,Austin,2023-06-11,Active
+C00349,Evergreen Partners 349,Professional Services,Enterprise,Dallas,2019-10-10,Active
+C00350,Northstar Group 350,Financial Services,SMB,New York,2018-06-14,Churned
+C00351,Westbridge Group 351,Technology,Enterprise,Dallas,2022-08-31,Active
+C00352,Pioneer Group 352,Professional Services,Mid-Market,Seattle,2023-02-25,Active
+C00353,Lumen Group 353,Manufacturing,Enterprise,Chicago,2024-03-12,Active
+C00354,Evergreen Partners 354,Manufacturing,Mid-Market,Phoenix,2020-01-05,Active
+C00355,BluePeak Holdings 355,Healthcare,SMB,Denver,2023-06-19,Active
+C00356,Lumen Group 356,Retail,Enterprise,Boston,2018-02-16,Active
+C00357,Westbridge Partners 357,Healthcare,SMB,Chicago,2020-06-26,Active
+C00358,HarborPoint Holdings 358,Financial Services,SMB,Austin,2021-05-06,Active
+C00359,Pioneer Partners 359,Technology,Enterprise,Portland,2023-12-01,Active
+C00360,Lumen Systems 360,Healthcare,SMB,Portland,2020-02-17,Active
+C00361,Pioneer Partners 361,Professional Services,Mid-Market,Boston,2023-01-21,Active
+C00362,Evergreen Holdings 362,Financial Services,SMB,Portland,2018-03-22,Active
+C00363,Westbridge Holdings 363,Professional Services,SMB,Chicago,2019-11-24,Active
+C00364,Ironwood Industries 364,Technology,SMB,Denver,2021-05-04,Active
+C00365,Pioneer Group 365,Retail,SMB,Seattle,2019-02-06,Active
+C00366,Lumen Partners 366,Professional Services,SMB,Chicago,2022-11-04,Active
+C00367,Summit Systems 367,Retail,Mid-Market,Austin,2021-06-20,Active
+C00368,HarborPoint Industries 368,Retail,Mid-Market,New York,2018-07-31,Active
+C00369,Summit Holdings 369,Professional Services,Mid-Market,Dallas,2022-11-29,Churned
+C00370,BluePeak Partners 370,Professional Services,Mid-Market,New York,2018-12-28,At Risk
+C00371,Evergreen Industries 371,Professional Services,Mid-Market,New York,2018-06-29,Active
+C00372,Evergreen Holdings 372,Manufacturing,SMB,New York,2018-08-14,Active
+C00373,CedarWorks Industries 373,Retail,SMB,New York,2020-04-02,Active
+C00374,CedarWorks Holdings 374,Professional Services,SMB,Dallas,2020-01-04,Active
+C00375,Evergreen Systems 375,Professional Services,Mid-Market,San Diego,2019-04-17,Active
+C00376,Lumen Industries 376,Healthcare,Mid-Market,Seattle,2020-02-17,Active
+C00377,HarborPoint Holdings 377,Professional Services,Mid-Market,Boston,2023-03-07,Active
+C00378,BluePeak Partners 378,Manufacturing,Mid-Market,Portland,2023-01-30,Active
+C00379,HarborPoint Systems 379,Financial Services,SMB,Austin,2021-10-11,Active
+C00380,CedarWorks Group 380,Manufacturing,SMB,Seattle,2020-10-02,Active
+C00381,Summit Systems 381,Retail,SMB,Austin,2022-05-24,Active
+C00382,Summit Partners 382,Technology,SMB,New York,2022-02-05,Active
+C00383,Summit Systems 383,Financial Services,Mid-Market,Phoenix,2023-07-03,Active
+C00384,CedarWorks Systems 384,Technology,SMB,Portland,2020-06-11,Active
+C00385,Summit Partners 385,Manufacturing,SMB,Chicago,2019-10-10,Active
+C00386,Pioneer Holdings 386,Professional Services,Mid-Market,Boston,2022-05-20,Active
+C00387,Summit Partners 387,Professional Services,Mid-Market,Dallas,2019-06-30,At Risk
+C00388,Westbridge Holdings 388,Manufacturing,Mid-Market,Austin,2021-01-30,Active
+C00389,Westbridge Holdings 389,Financial Services,Enterprise,Dallas,2021-09-16,Active
+C00390,CedarWorks Partners 390,Professional Services,SMB,Dallas,2018-05-08,Churned
+C00391,Northstar Industries 391,Retail,SMB,Phoenix,2022-05-29,Active
+C00392,Redwood Industries 392,Retail,Enterprise,Dallas,2022-01-07,Active
+C00393,HarborPoint Industries 393,Retail,Mid-Market,Phoenix,2024-02-14,Active
+C00394,Evergreen Systems 394,Technology,Mid-Market,Portland,2023-08-19,Active
+C00395,Redwood Group 395,Technology,SMB,Phoenix,2023-11-11,Active
+C00396,Summit Partners 396,Retail,Enterprise,Austin,2023-01-05,Active
+C00397,Northstar Group 397,Retail,Mid-Market,Chicago,2019-06-12,At Risk
+C00398,CedarWorks Holdings 398,Professional Services,SMB,Denver,2023-01-13,Active
+C00399,HarborPoint Industries 399,Manufacturing,Enterprise,Seattle,2024-03-20,Active
+C00400,Evergreen Partners 400,Healthcare,Enterprise,Boston,2022-03-08,Churned
+C00401,Pioneer Partners 401,Retail,Mid-Market,New York,2021-03-17,Active
+C00402,HarborPoint Industries 402,Retail,Mid-Market,Boston,2020-11-30,Active
+C00403,Northstar Group 403,Manufacturing,SMB,Seattle,2023-08-03,Active
+C00404,Northstar Group 404,Professional Services,Mid-Market,Phoenix,2018-12-10,Churned
+C00405,Northstar Partners 405,Retail,SMB,San Diego,2022-06-22,Active
+C00406,Summit Holdings 406,Technology,SMB,Dallas,2022-05-15,Active
+C00407,Lumen Industries 407,Manufacturing,SMB,Portland,2019-08-13,Active
+C00408,Evergreen Systems 408,Healthcare,Mid-Market,Portland,2022-08-13,Active
+C00409,Redwood Partners 409,Financial Services,SMB,Phoenix,2019-02-01,Active
+C00410,Evergreen Systems 410,Healthcare,Enterprise,San Diego,2019-06-04,Active
+C00411,Redwood Holdings 411,Technology,Mid-Market,Austin,2023-11-08,Active
+C00412,Lumen Partners 412,Retail,Enterprise,Seattle,2019-05-03,Active
+C00413,Westbridge Partners 413,Financial Services,SMB,Portland,2021-07-10,Active
+C00414,CedarWorks Systems 414,Technology,SMB,San Diego,2019-12-31,Active
+C00415,CedarWorks Group 415,Professional Services,SMB,New York,2018-10-24,Active
+C00416,CedarWorks Group 416,Retail,Mid-Market,Portland,2019-12-13,Active
+C00417,Westbridge Systems 417,Healthcare,SMB,Chicago,2020-03-18,At Risk
+C00418,Summit Partners 418,Healthcare,SMB,Dallas,2024-04-22,Active
+C00419,Lumen Systems 419,Professional Services,SMB,Phoenix,2022-11-22,Active
+C00420,Redwood Partners 420,Manufacturing,Mid-Market,Austin,2020-07-06,Active
+C00421,Cloudline Partners 421,Manufacturing,SMB,Denver,2024-09-19,Active
+C00422,CedarWorks Systems 422,Retail,Mid-Market,Austin,2022-04-05,Active
+C00423,Lumen Holdings 423,Professional Services,SMB,Seattle,2019-12-03,Active
+C00424,Westbridge Systems 424,Professional Services,Mid-Market,Boston,2018-09-27,Active
+C00425,Summit Group 425,Professional Services,Enterprise,Denver,2022-05-03,Active
+C00426,Westbridge Systems 426,Professional Services,Mid-Market,Denver,2018-09-28,Active
+C00427,Summit Industries 427,Healthcare,Mid-Market,Denver,2018-02-09,Active
+C00428,Northstar Partners 428,Healthcare,Mid-Market,Dallas,2022-09-24,Active
+C00429,Lumen Group 429,Professional Services,Mid-Market,Dallas,2022-05-26,Active
+C00430,Westbridge Holdings 430,Manufacturing,Mid-Market,Portland,2019-09-22,Churned
+C00431,Lumen Industries 431,Financial Services,Mid-Market,Austin,2023-11-20,Churned
+C00432,Summit Group 432,Professional Services,Mid-Market,Dallas,2021-01-04,Active
+C00433,Ironwood Systems 433,Financial Services,Mid-Market,Boston,2022-09-21,Churned
+C00434,CedarWorks Partners 434,Retail,SMB,Phoenix,2020-02-24,Churned
+C00435,Cloudline Holdings 435,Professional Services,SMB,New York,2018-09-20,Active
+C00436,Summit Partners 436,Technology,Mid-Market,Denver,2023-07-12,Active
+C00437,BluePeak Holdings 437,Healthcare,Mid-Market,Seattle,2018-05-17,Active
+C00438,Pioneer Industries 438,Financial Services,Mid-Market,Dallas,2021-03-07,Active
+C00439,CedarWorks Industries 439,Financial Services,SMB,Dallas,2024-01-06,Churned
+C00440,Lumen Partners 440,Technology,Mid-Market,New York,2018-02-05,Active
+C00441,Ironwood Industries 441,Technology,Enterprise,Seattle,2021-11-22,Active
+C00442,Cloudline Holdings 442,Financial Services,Mid-Market,New York,2020-02-06,Active
+C00443,Evergreen Systems 443,Manufacturing,Mid-Market,Chicago,2021-05-06,Active
+C00444,Northstar Partners 444,Financial Services,Mid-Market,Portland,2018-11-13,Active
+C00445,Cloudline Systems 445,Financial Services,Enterprise,New York,2020-06-09,Churned
+C00446,HarborPoint Group 446,Technology,SMB,Chicago,2023-07-19,Active
+C00447,Pioneer Systems 447,Technology,Mid-Market,Denver,2023-06-20,Active
+C00448,Evergreen Industries 448,Professional Services,Mid-Market,New York,2024-05-12,Active
+C00449,Northstar Partners 449,Retail,Enterprise,Seattle,2018-05-15,Active
+C00450,Redwood Systems 450,Financial Services,Mid-Market,Phoenix,2019-06-24,Active

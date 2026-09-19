@@ -1,0 +1,361 @@
+employee_id,department_id,first_name,last_name,job_title,hire_date,employment_status,annual_salary_usd
+E00001,D005,Avery,Morris,Manager,2015-01-16,Active,182800.00
+E00002,D010,Wesley,Hayes,Manager,2020-12-30,Active,160700.00
+E00003,D006,Finley,Ellis,Manager,2018-08-24,Active,68700.00
+E00004,D006,Avery,Adams,Manager,2025-01-02,Active,100900.00
+E00005,D002,Casey,Patel,Manager,2019-02-06,Inactive,50300.00
+E00006,D006,Riley,Nguyen,Manager,2025-02-17,Active,93900.00
+E00007,D003,Casey,Vega,Manager,2015-12-05,Active,93200.00
+E00008,D011,Blake,Owens,Manager,2023-05-27,Active,92800.00
+E00009,D002,Finley,Shaw,Manager,2021-05-31,Active,145400.00
+E00010,D005,Finley,Shaw,Manager,2024-08-29,Active,58100.00
+E00011,D002,Terry,Jenkins,Manager,2017-01-10,Active,137800.00
+E00012,D001,Wesley,Grant,Manager,2016-05-04,Active,182900.00
+E00013,D005,Wesley,Lopez,Senior Associate,2023-08-24,Active,123500.00
+E00014,D004,Finley,Nguyen,Manager,2018-05-16,Active,129700.00
+E00015,D005,Jordan,Grant,Analyst,2021-02-28,Active,67500.00
+E00016,D003,Jordan,Jenkins,Senior Associate,2018-06-14,Active,87400.00
+E00017,D004,Reese,Morris,Coordinator,2017-12-17,Active,160900.00
+E00018,D007,Wesley,Owens,Manager,2015-03-07,Active,158800.00
+E00019,D008,Parker,Kim,Manager,2023-01-25,Active,123200.00
+E00020,D003,Kai,Hayes,Analyst,2019-04-03,Active,126900.00
+E00021,D007,Taylor,Ellis,Consultant,2023-01-22,Active,112700.00
+E00022,D007,Reese,Dawson,Specialist,2024-01-14,Active,109000.00
+E00023,D002,Jordan,Jenkins,Specialist,2016-12-19,Active,96200.00
+E00024,D002,Terry,Vega,Coordinator,2017-08-21,On Leave,69800.00
+E00025,D009,Taylor,Lopez,Manager,2021-07-29,Active,56500.00
+E00026,D005,Jordan,Bennett,Specialist,2016-01-05,Active,63600.00
+E00027,D007,Skyler,Carter,Analyst,2019-08-17,Active,128900.00
+E00028,D007,Casey,Kim,Consultant,2023-05-10,Active,168100.00
+E00029,D007,Sawyer,Patel,Senior Associate,2021-06-10,Active,157800.00
+E00030,D003,Logan,Bennett,Analyst,2019-06-30,Inactive,72300.00
+E00031,D011,Logan,Adams,Consultant,2018-04-20,Active,114200.00
+E00032,D008,Kai,Dawson,Consultant,2024-06-24,Active,177300.00
+E00033,D008,Casey,Lopez,Coordinator,2024-07-30,Active,64700.00
+E00034,D004,Taylor,Vega,Senior Associate,2015-12-28,Active,138700.00
+E00035,D005,Finley,Hayes,Analyst,2019-12-27,Active,116200.00
+E00036,D006,Jordan,Patel,Analyst,2018-11-25,Active,76300.00
+E00037,D003,Sawyer,Lopez,Coordinator,2018-11-03,Active,64900.00
+E00038,D010,Taylor,Irwin,Coordinator,2015-06-02,Inactive,169500.00
+E00039,D001,Taylor,Irwin,Analyst,2024-07-22,Active,49400.00
+E00040,D002,Casey,Patel,Senior Associate,2022-06-13,Active,138400.00
+E00041,D002,Finley,Bennett,Analyst,2019-12-17,Active,125600.00
+E00042,D010,Finley,Ellis,Coordinator,2015-08-08,Active,168800.00
+E00043,D008,Finley,Ellis,Analyst,2017-04-23,Active,65200.00
+E00044,D011,Riley,Hayes,Consultant,2024-01-25,Active,149600.00
+E00045,D006,Finley,Hayes,Analyst,2024-02-19,Active,120100.00
+E00046,D010,Skyler,Vega,Analyst,2017-04-22,Active,173500.00
+E00047,D003,Rowan,Ellis,Consultant,2019-12-27,Active,172200.00
+E00048,D012,Kai,Shaw,Manager,2016-08-10,Active,167300.00
+E00049,D007,Skyler,Reed,Senior Associate,2019-05-18,Active,75700.00
+E00050,D005,Emery,Kim,Analyst,2020-03-08,Active,92900.00
+E00051,D006,Logan,Turner,Specialist,2021-09-28,Active,119000.00
+E00052,D011,Parker,Shaw,Analyst,2025-07-08,Active,68700.00
+E00053,D001,Terry,Adams,Senior Associate,2018-03-19,Active,87600.00
+E00054,D001,Riley,Dawson,Consultant,2021-12-21,Active,94600.00
+E00055,D002,Rowan,Foster,Specialist,2017-10-11,Active,148400.00
+E00056,D009,Riley,Dawson,Specialist,2020-04-18,Active,51300.00
+E00057,D003,Sawyer,Lopez,Coordinator,2020-05-06,Active,95000.00
+E00058,D008,Riley,Jenkins,Specialist,2018-05-16,Active,95500.00
+E00059,D010,Rowan,Lopez,Specialist,2019-11-19,Active,110900.00
+E00060,D002,Morgan,Bennett,Analyst,2022-09-27,Active,62100.00
+E00061,D011,Finley,Reed,Analyst,2024-11-07,On Leave,148100.00
+E00062,D010,Terry,Turner,Senior Associate,2024-05-15,Active,146100.00
+E00063,D005,Taylor,Hayes,Consultant,2020-06-25,Active,87200.00
+E00064,D004,Terry,Jenkins,Specialist,2022-06-15,Active,142500.00
+E00065,D009,Kai,Hayes,Consultant,2016-06-16,Active,162600.00
+E00066,D010,Emery,Ellis,Consultant,2021-04-03,Active,168700.00
+E00067,D012,Sawyer,Hayes,Consultant,2019-03-05,On Leave,134500.00
+E00068,D009,Rowan,Bennett,Coordinator,2023-04-15,Active,76200.00
+E00069,D002,Skyler,Jenkins,Consultant,2016-05-30,Active,51200.00
+E00070,D012,Devon,Reed,Senior Associate,2015-06-26,Active,65700.00
+E00071,D007,Kai,Grant,Coordinator,2023-06-11,Active,94700.00
+E00072,D012,Riley,Reed,Coordinator,2018-09-30,Active,139900.00
+E00073,D007,Logan,Shaw,Specialist,2015-03-22,Active,153900.00
+E00074,D007,Parker,Adams,Specialist,2017-04-30,Active,77700.00
+E00075,D001,Emery,Kim,Specialist,2019-07-07,Active,107800.00
+E00076,D007,Taylor,Owens,Consultant,2020-04-28,Active,125600.00
+E00077,D011,Terry,Kim,Specialist,2017-09-25,Active,138600.00
+E00078,D010,Riley,Vega,Analyst,2017-02-15,Active,181000.00
+E00079,D010,Parker,Reed,Specialist,2025-06-21,Active,175400.00
+E00080,D008,Taylor,Lopez,Specialist,2021-07-05,Active,131300.00
+E00081,D004,Skyler,Nguyen,Consultant,2025-04-10,Active,137900.00
+E00082,D011,Finley,Ellis,Specialist,2016-02-06,Active,184200.00
+E00083,D006,Finley,Bennett,Specialist,2018-10-03,Active,88500.00
+E00084,D004,Morgan,Grant,Consultant,2018-07-14,On Leave,85400.00
+E00085,D010,Sawyer,Grant,Analyst,2021-08-02,Active,174700.00
+E00086,D001,Morgan,Irwin,Specialist,2019-06-21,Inactive,144300.00
+E00087,D008,Blake,Irwin,Senior Associate,2019-09-26,Active,106100.00
+E00088,D009,Quinn,Adams,Consultant,2015-04-19,Active,106200.00
+E00089,D011,Parker,Lopez,Consultant,2022-12-24,Active,162200.00
+E00090,D007,Kai,Shaw,Coordinator,2019-11-25,Active,137500.00
+E00091,D005,Devon,Hayes,Senior Associate,2019-05-25,Active,105300.00
+E00092,D009,Quinn,Turner,Consultant,2018-08-15,Active,122600.00
+E00093,D012,Terry,Lopez,Senior Associate,2025-06-25,Active,177400.00
+E00094,D010,Logan,Jenkins,Specialist,2017-10-25,Active,129600.00
+E00095,D002,Morgan,Kim,Coordinator,2019-07-24,Active,77100.00
+E00096,D001,Morgan,Vega,Coordinator,2023-01-10,Active,135200.00
+E00097,D003,Blake,Dawson,Coordinator,2019-03-23,Active,88700.00
+E00098,D003,Blake,Vega,Specialist,2015-02-26,Active,174800.00
+E00099,D010,Blake,Foster,Coordinator,2016-02-26,Active,121400.00
+E00100,D003,Terry,Dawson,Specialist,2022-01-20,Active,163300.00
+E00101,D009,Blake,Kim,Consultant,2018-06-09,Active,151600.00
+E00102,D008,Wesley,Hayes,Analyst,2022-10-17,Active,147900.00
+E00103,D009,Finley,Grant,Coordinator,2019-03-06,Active,75600.00
+E00104,D010,Quinn,Irwin,Specialist,2020-12-15,Active,134100.00
+E00105,D003,Riley,Morris,Specialist,2024-03-29,Active,181200.00
+E00106,D002,Jordan,Foster,Analyst,2024-07-20,On Leave,99200.00
+E00107,D009,Terry,Shaw,Coordinator,2022-02-24,Active,53400.00
+E00108,D006,Finley,Bennett,Analyst,2016-08-30,Active,61900.00
+E00109,D010,Devon,Foster,Senior Associate,2024-03-08,Active,166100.00
+E00110,D006,Avery,Kim,Consultant,2020-10-03,Active,144900.00
+E00111,D010,Finley,Grant,Consultant,2019-10-09,Active,92100.00
+E00112,D005,Wesley,Jenkins,Consultant,2016-07-22,Active,48700.00
+E00113,D002,Taylor,Carter,Specialist,2015-02-26,Active,142800.00
+E00114,D003,Kai,Morris,Consultant,2023-01-20,Active,75700.00
+E00115,D004,Sawyer,Carter,Specialist,2015-01-04,Active,159300.00
+E00116,D009,Rowan,Ellis,Analyst,2015-03-22,Active,79900.00
+E00117,D009,Finley,Hayes,Coordinator,2020-02-21,Active,51500.00
+E00118,D001,Blake,Dawson,Coordinator,2024-07-12,Active,126600.00
+E00119,D001,Casey,Reed,Coordinator,2017-08-23,Active,169300.00
+E00120,D005,Blake,Lopez,Analyst,2025-07-21,Inactive,149700.00
+E00121,D008,Logan,Dawson,Specialist,2023-05-15,Active,136300.00
+E00122,D006,Avery,Reed,Specialist,2020-05-10,Active,93500.00
+E00123,D004,Kai,Lopez,Senior Associate,2020-04-26,Active,75800.00
+E00124,D007,Finley,Morris,Consultant,2019-01-12,Active,171500.00
+E00125,D005,Wesley,Adams,Senior Associate,2018-12-18,Active,116100.00
+E00126,D003,Skyler,Turner,Coordinator,2021-06-19,Active,62200.00
+E00127,D004,Casey,Patel,Senior Associate,2018-02-12,Active,84800.00
+E00128,D007,Casey,Hayes,Senior Associate,2019-03-26,Active,133000.00
+E00129,D001,Reese,Lopez,Analyst,2022-05-24,Active,127500.00
+E00130,D005,Logan,Ellis,Senior Associate,2023-09-02,Active,135900.00
+E00131,D001,Logan,Dawson,Senior Associate,2021-04-18,Active,73600.00
+E00132,D010,Skyler,Lopez,Senior Associate,2017-07-10,Active,151800.00
+E00133,D008,Taylor,Kim,Senior Associate,2024-03-16,Active,161900.00
+E00134,D011,Taylor,Dawson,Consultant,2025-08-21,Active,152200.00
+E00135,D009,Skyler,Shaw,Consultant,2015-04-07,Active,141800.00
+E00136,D010,Casey,Grant,Specialist,2022-04-22,Active,161800.00
+E00137,D009,Taylor,Ellis,Senior Associate,2022-09-28,Active,148000.00
+E00138,D004,Skyler,Patel,Coordinator,2025-02-02,Active,109900.00
+E00139,D005,Reese,Bennett,Senior Associate,2017-08-19,Active,81900.00
+E00140,D004,Wesley,Irwin,Consultant,2017-04-19,Active,184700.00
+E00141,D002,Riley,Jenkins,Senior Associate,2024-02-16,Active,102500.00
+E00142,D010,Wesley,Ellis,Specialist,2015-03-28,Active,144500.00
+E00143,D001,Blake,Morris,Consultant,2015-04-29,Active,76900.00
+E00144,D002,Blake,Shaw,Coordinator,2022-08-31,Active,125500.00
+E00145,D001,Skyler,Hayes,Coordinator,2023-06-24,Active,112300.00
+E00146,D005,Devon,Adams,Analyst,2021-06-27,Active,136900.00
+E00147,D012,Parker,Shaw,Analyst,2023-01-24,Active,127700.00
+E00148,D001,Quinn,Hayes,Coordinator,2015-12-28,Active,97400.00
+E00149,D003,Taylor,Adams,Coordinator,2016-05-27,Active,110500.00
+E00150,D003,Finley,Morris,Senior Associate,2025-02-23,Active,131100.00
+E00151,D008,Avery,Irwin,Specialist,2024-08-26,Active,120100.00
+E00152,D007,Wesley,Dawson,Senior Associate,2016-08-26,Active,85000.00
+E00153,D004,Emery,Turner,Specialist,2018-10-15,Active,58200.00
+E00154,D011,Sawyer,Hayes,Specialist,2022-03-28,Active,126600.00
+E00155,D010,Morgan,Foster,Senior Associate,2022-03-24,Active,84500.00
+E00156,D002,Devon,Irwin,Specialist,2019-12-30,Active,156800.00
+E00157,D006,Skyler,Adams,Specialist,2018-03-10,Active,65000.00
+E00158,D011,Morgan,Foster,Consultant,2017-01-08,Active,57200.00
+E00159,D007,Emery,Reed,Specialist,2019-10-19,Active,166300.00
+E00160,D004,Quinn,Owens,Consultant,2015-02-02,Active,49800.00
+E00161,D009,Reese,Kim,Analyst,2018-04-18,Active,127400.00
+E00162,D009,Kai,Reed,Coordinator,2018-07-16,Active,82700.00
+E00163,D007,Jordan,Grant,Senior Associate,2018-07-26,Active,63600.00
+E00164,D010,Finley,Hayes,Specialist,2015-11-29,Active,128900.00
+E00165,D003,Skyler,Hayes,Specialist,2019-12-17,Active,132800.00
+E00166,D003,Wesley,Ellis,Consultant,2015-06-06,Active,128700.00
+E00167,D010,Skyler,Bennett,Analyst,2018-03-08,Active,107200.00
+E00168,D002,Finley,Dawson,Senior Associate,2015-08-10,Active,59900.00
+E00169,D008,Morgan,Grant,Specialist,2017-11-28,Active,105000.00
+E00170,D011,Finley,Morris,Consultant,2025-08-16,Active,58500.00
+E00171,D012,Devon,Grant,Consultant,2021-03-01,Active,137700.00
+E00172,D001,Blake,Jenkins,Consultant,2018-09-04,Active,58800.00
+E00173,D002,Morgan,Owens,Specialist,2022-02-20,Active,163600.00
+E00174,D005,Logan,Grant,Consultant,2024-12-26,Active,160600.00
+E00175,D012,Sawyer,Nguyen,Specialist,2024-01-05,Active,110700.00
+E00176,D007,Terry,Dawson,Specialist,2019-03-23,Active,100000.00
+E00177,D004,Blake,Morris,Consultant,2016-08-01,Active,120600.00
+E00178,D003,Logan,Irwin,Senior Associate,2018-10-17,Active,170700.00
+E00179,D004,Quinn,Turner,Specialist,2024-03-14,Inactive,67500.00
+E00180,D007,Wesley,Ellis,Coordinator,2017-01-20,Active,69900.00
+E00181,D001,Jordan,Owens,Specialist,2020-07-27,Active,95800.00
+E00182,D008,Riley,Foster,Consultant,2019-09-08,Active,123900.00
+E00183,D003,Taylor,Jenkins,Analyst,2019-11-25,Active,155200.00
+E00184,D004,Logan,Reed,Analyst,2018-01-06,Active,50800.00
+E00185,D012,Devon,Ellis,Coordinator,2018-09-12,Active,67800.00
+E00186,D008,Reese,Vega,Analyst,2025-02-09,Active,149600.00
+E00187,D005,Parker,Patel,Specialist,2023-03-20,Active,182600.00
+E00188,D003,Devon,Irwin,Consultant,2022-05-04,Active,52500.00
+E00189,D002,Riley,Lopez,Consultant,2025-06-07,Active,182600.00
+E00190,D003,Skyler,Morris,Analyst,2016-06-03,Active,60700.00
+E00191,D010,Blake,Irwin,Senior Associate,2020-01-26,Active,134700.00
+E00192,D004,Finley,Reed,Analyst,2018-03-10,Active,60700.00
+E00193,D006,Blake,Hayes,Consultant,2017-02-09,Active,95400.00
+E00194,D005,Reese,Lopez,Specialist,2016-05-10,Active,158000.00
+E00195,D006,Finley,Patel,Coordinator,2017-04-03,Active,183500.00
+E00196,D011,Terry,Nguyen,Coordinator,2015-11-27,Active,143900.00
+E00197,D012,Devon,Dawson,Coordinator,2017-09-18,Active,59300.00
+E00198,D004,Parker,Adams,Coordinator,2018-10-22,Inactive,117500.00
+E00199,D010,Quinn,Shaw,Specialist,2025-08-20,On Leave,64000.00
+E00200,D008,Taylor,Patel,Senior Associate,2023-01-21,Active,65700.00
+E00201,D009,Wesley,Foster,Analyst,2017-07-05,Active,86700.00
+E00202,D010,Skyler,Bennett,Coordinator,2022-02-09,Active,87900.00
+E00203,D007,Riley,Owens,Coordinator,2023-02-07,Active,81900.00
+E00204,D005,Parker,Bennett,Consultant,2015-07-06,Active,148600.00
+E00205,D009,Sawyer,Dawson,Consultant,2023-07-20,Active,151500.00
+E00206,D010,Jordan,Jenkins,Consultant,2020-09-04,Active,51500.00
+E00207,D009,Finley,Dawson,Analyst,2021-05-13,Active,160300.00
+E00208,D002,Casey,Morris,Specialist,2015-09-26,Active,87800.00
+E00209,D008,Reese,Lopez,Specialist,2016-03-10,Active,125000.00
+E00210,D011,Finley,Adams,Specialist,2016-01-12,Active,88700.00
+E00211,D004,Morgan,Adams,Coordinator,2023-10-23,Active,98200.00
+E00212,D010,Morgan,Kim,Coordinator,2022-08-05,Active,65800.00
+E00213,D007,Avery,Adams,Senior Associate,2018-09-05,Active,109300.00
+E00214,D002,Blake,Owens,Consultant,2021-04-06,Active,86400.00
+E00215,D001,Kai,Nguyen,Senior Associate,2024-08-03,Active,91500.00
+E00216,D011,Terry,Vega,Analyst,2020-02-14,Active,52400.00
+E00217,D004,Casey,Irwin,Coordinator,2019-05-21,Active,87000.00
+E00218,D007,Reese,Vega,Coordinator,2017-05-18,Active,157900.00
+E00219,D007,Jordan,Bennett,Consultant,2018-02-16,Active,129400.00
+E00220,D001,Wesley,Morris,Analyst,2019-07-19,Inactive,174000.00
+E00221,D005,Avery,Vega,Consultant,2019-10-30,Active,53500.00
+E00222,D006,Emery,Nguyen,Coordinator,2019-10-20,Active,179800.00
+E00223,D006,Casey,Foster,Consultant,2021-09-12,Active,157600.00
+E00224,D007,Logan,Dawson,Consultant,2021-01-13,Active,85500.00
+E00225,D001,Avery,Lopez,Specialist,2021-12-12,Active,68700.00
+E00226,D003,Sawyer,Owens,Senior Associate,2022-08-27,On Leave,169800.00
+E00227,D007,Quinn,Foster,Senior Associate,2022-10-16,Active,141700.00
+E00228,D007,Taylor,Foster,Analyst,2015-06-02,Active,76200.00
+E00229,D009,Rowan,Jenkins,Analyst,2018-11-27,Active,122300.00
+E00230,D006,Quinn,Carter,Coordinator,2015-03-09,Active,64900.00
+E00231,D012,Morgan,Nguyen,Specialist,2021-03-28,Active,64500.00
+E00232,D001,Wesley,Lopez,Coordinator,2024-09-02,Active,181100.00
+E00233,D008,Logan,Owens,Coordinator,2024-06-13,Active,126600.00
+E00234,D012,Kai,Ellis,Consultant,2018-09-23,Active,55400.00
+E00235,D001,Devon,Kim,Senior Associate,2016-04-10,Active,146900.00
+E00236,D001,Logan,Lopez,Analyst,2018-07-13,Active,78900.00
+E00237,D009,Terry,Owens,Senior Associate,2024-01-18,Active,54100.00
+E00238,D007,Kai,Grant,Coordinator,2016-10-19,Active,96600.00
+E00239,D011,Reese,Bennett,Senior Associate,2025-07-02,Active,90600.00
+E00240,D011,Taylor,Grant,Analyst,2021-09-06,Active,138500.00
+E00241,D010,Quinn,Nguyen,Analyst,2019-04-11,Active,76200.00
+E00242,D012,Casey,Lopez,Senior Associate,2021-05-21,Inactive,116500.00
+E00243,D001,Emery,Turner,Senior Associate,2021-08-28,Active,171200.00
+E00244,D007,Parker,Owens,Analyst,2017-06-01,Active,51800.00
+E00245,D010,Wesley,Hayes,Specialist,2021-01-04,Active,148800.00
+E00246,D009,Terry,Foster,Consultant,2015-09-18,Active,101000.00
+E00247,D001,Emery,Reed,Coordinator,2023-07-30,Active,97900.00
+E00248,D004,Logan,Irwin,Analyst,2025-05-13,Inactive,100000.00
+E00249,D003,Avery,Jenkins,Senior Associate,2023-01-16,Active,58100.00
+E00250,D005,Blake,Bennett,Coordinator,2019-06-18,Active,69300.00
+E00251,D001,Logan,Dawson,Senior Associate,2022-12-12,Active,172200.00
+E00252,D003,Riley,Nguyen,Consultant,2020-01-11,Active,171700.00
+E00253,D005,Quinn,Shaw,Analyst,2025-02-12,Active,157100.00
+E00254,D012,Parker,Kim,Consultant,2015-10-03,Active,183600.00
+E00255,D009,Terry,Owens,Coordinator,2020-09-23,Active,86800.00
+E00256,D007,Blake,Turner,Consultant,2021-08-24,Active,137200.00
+E00257,D011,Sawyer,Kim,Senior Associate,2025-08-21,Active,157500.00
+E00258,D011,Quinn,Turner,Specialist,2021-02-05,Active,134900.00
+E00259,D008,Taylor,Reed,Consultant,2022-06-21,Active,57400.00
+E00260,D007,Taylor,Shaw,Specialist,2017-10-19,Active,70700.00
+E00261,D012,Terry,Jenkins,Analyst,2019-12-16,Active,74000.00
+E00262,D012,Avery,Turner,Analyst,2015-09-22,Active,129700.00
+E00263,D003,Logan,Patel,Consultant,2021-10-20,Active,94700.00
+E00264,D004,Wesley,Patel,Senior Associate,2020-11-09,Active,127300.00
+E00265,D012,Taylor,Shaw,Senior Associate,2020-11-21,Active,77700.00
+E00266,D007,Riley,Foster,Coordinator,2023-10-22,Active,99900.00
+E00267,D002,Blake,Nguyen,Coordinator,2018-05-23,Active,97300.00
+E00268,D010,Casey,Nguyen,Analyst,2020-12-13,Active,80400.00
+E00269,D003,Reese,Dawson,Coordinator,2025-07-16,Active,141600.00
+E00270,D009,Terry,Bennett,Consultant,2021-08-17,Active,173500.00
+E00271,D008,Casey,Turner,Senior Associate,2020-05-18,On Leave,61500.00
+E00272,D008,Skyler,Nguyen,Specialist,2022-03-01,Active,165500.00
+E00273,D009,Terry,Irwin,Senior Associate,2025-01-01,On Leave,143600.00
+E00274,D012,Finley,Owens,Coordinator,2020-11-17,Active,173200.00
+E00275,D001,Reese,Carter,Specialist,2018-07-06,Active,104100.00
+E00276,D001,Emery,Shaw,Specialist,2022-06-30,Active,150200.00
+E00277,D008,Riley,Dawson,Consultant,2016-10-24,Active,124300.00
+E00278,D009,Wesley,Dawson,Analyst,2018-05-04,Active,135400.00
+E00279,D010,Quinn,Reed,Specialist,2017-03-09,Active,73700.00
+E00280,D004,Sawyer,Dawson,Consultant,2020-05-01,Active,99100.00
+E00281,D004,Riley,Owens,Senior Associate,2022-07-14,Active,57400.00
+E00282,D002,Reese,Turner,Specialist,2018-11-08,Active,106100.00
+E00283,D003,Finley,Nguyen,Analyst,2015-11-12,Active,92500.00
+E00284,D004,Skyler,Nguyen,Coordinator,2016-06-14,Active,66100.00
+E00285,D006,Blake,Turner,Senior Associate,2015-03-30,Active,88600.00
+E00286,D004,Finley,Dawson,Specialist,2015-11-19,Active,135200.00
+E00287,D010,Avery,Vega,Senior Associate,2023-06-26,Active,140200.00
+E00288,D010,Skyler,Patel,Specialist,2018-02-24,Active,145000.00
+E00289,D007,Jordan,Owens,Coordinator,2016-01-10,Active,178700.00
+E00290,D003,Terry,Adams,Specialist,2017-01-28,Active,77000.00
+E00291,D012,Morgan,Adams,Coordinator,2017-09-23,Active,132100.00
+E00292,D007,Wesley,Vega,Senior Associate,2019-03-31,Active,80500.00
+E00293,D002,Quinn,Adams,Coordinator,2016-08-07,Active,83700.00
+E00294,D002,Terry,Kim,Analyst,2019-02-27,Active,111700.00
+E00295,D009,Logan,Jenkins,Analyst,2015-11-18,Active,112800.00
+E00296,D002,Reese,Dawson,Senior Associate,2019-05-28,Active,122100.00
+E00297,D001,Riley,Bennett,Senior Associate,2025-01-23,Active,112400.00
+E00298,D003,Parker,Hayes,Analyst,2017-09-14,Active,72400.00
+E00299,D006,Kai,Nguyen,Senior Associate,2016-04-11,Active,103600.00
+E00300,D006,Casey,Dawson,Consultant,2015-11-06,Active,82200.00
+E00301,D007,Parker,Grant,Senior Associate,2025-05-13,Active,58700.00
+E00302,D006,Emery,Adams,Specialist,2024-08-09,Active,129400.00
+E00303,D010,Avery,Shaw,Specialist,2019-05-04,Active,64500.00
+E00304,D008,Logan,Shaw,Coordinator,2019-06-12,Active,125100.00
+E00305,D001,Sawyer,Nguyen,Senior Associate,2023-11-04,Inactive,166100.00
+E00306,D001,Taylor,Vega,Senior Associate,2023-06-29,Active,126000.00
+E00307,D011,Casey,Lopez,Coordinator,2022-10-02,Active,97800.00
+E00308,D012,Wesley,Reed,Specialist,2020-08-23,Active,178300.00
+E00309,D009,Reese,Bennett,Consultant,2015-02-20,Active,164200.00
+E00310,D004,Casey,Shaw,Consultant,2016-10-13,Active,91400.00
+E00311,D007,Reese,Jenkins,Coordinator,2018-04-12,Active,104700.00
+E00312,D005,Sawyer,Owens,Specialist,2022-12-11,Active,92400.00
+E00313,D008,Avery,Owens,Specialist,2022-02-25,Active,163900.00
+E00314,D008,Wesley,Grant,Specialist,2023-01-18,Active,84400.00
+E00315,D007,Blake,Reed,Coordinator,2017-04-03,Active,175000.00
+E00316,D007,Parker,Morris,Analyst,2018-07-21,Active,114100.00
+E00317,D005,Avery,Irwin,Coordinator,2023-07-10,Active,112100.00
+E00318,D008,Blake,Turner,Specialist,2018-03-26,Active,61300.00
+E00319,D006,Devon,Carter,Consultant,2015-01-13,Active,116300.00
+E00320,D007,Wesley,Grant,Specialist,2018-03-03,Active,79800.00
+E00321,D006,Rowan,Morris,Analyst,2017-07-24,Active,120300.00
+E00322,D003,Devon,Foster,Coordinator,2024-11-27,Active,113100.00
+E00323,D006,Skyler,Nguyen,Consultant,2022-04-27,Inactive,106700.00
+E00324,D012,Jordan,Adams,Coordinator,2018-12-31,Inactive,93700.00
+E00325,D007,Sawyer,Nguyen,Consultant,2018-02-17,Active,116500.00
+E00326,D001,Jordan,Vega,Specialist,2021-10-19,Active,174000.00
+E00327,D003,Avery,Irwin,Specialist,2018-05-10,Active,154800.00
+E00328,D002,Taylor,Ellis,Analyst,2020-08-02,Active,77100.00
+E00329,D004,Jordan,Bennett,Coordinator,2024-07-10,Active,72500.00
+E00330,D010,Sawyer,Adams,Analyst,2017-02-16,Active,180900.00
+E00331,D007,Parker,Jenkins,Coordinator,2016-08-31,Active,143600.00
+E00332,D006,Jordan,Ellis,Specialist,2017-03-03,Active,154000.00
+E00333,D002,Parker,Adams,Specialist,2019-12-23,Active,152600.00
+E00334,D008,Finley,Kim,Specialist,2021-08-30,Active,99500.00
+E00335,D002,Morgan,Foster,Consultant,2020-11-07,Active,154600.00
+E00336,D004,Sawyer,Foster,Analyst,2020-03-24,Active,139300.00
+E00337,D009,Wesley,Kim,Consultant,2019-08-27,Active,66500.00
+E00338,D010,Sawyer,Adams,Consultant,2019-02-24,Active,50800.00
+E00339,D007,Finley,Bennett,Analyst,2018-01-05,Active,101100.00
+E00340,D003,Emery,Ellis,Specialist,2015-11-16,Active,51400.00
+E00341,D007,Jordan,Owens,Analyst,2020-03-18,Active,141100.00
+E00342,D008,Avery,Carter,Coordinator,2024-08-31,Active,139000.00
+E00343,D012,Skyler,Lopez,Analyst,2015-08-24,Active,61000.00
+E00344,D008,Finley,Dawson,Analyst,2020-12-09,Inactive,177400.00
+E00345,D005,Jordan,Irwin,Analyst,2016-11-01,Active,135200.00
+E00346,D006,Taylor,Kim,Coordinator,2018-08-06,Active,81400.00
+E00347,D003,Finley,Turner,Consultant,2023-02-03,Active,176900.00
+E00348,D004,Rowan,Adams,Specialist,2021-04-28,Active,117000.00
+E00349,D003,Casey,Shaw,Senior Associate,2017-03-31,Active,79200.00
+E00350,D012,Wesley,Adams,Specialist,2015-02-05,Active,77100.00
+E00351,D005,Reese,Grant,Analyst,2021-07-20,Active,148500.00
+E00352,D003,Kai,Vega,Consultant,2025-06-07,Active,179800.00
+E00353,D004,Devon,Foster,Senior Associate,2025-07-30,Active,160400.00
+E00354,D005,Avery,Grant,Senior Associate,2024-12-16,Active,55600.00
+E00355,D002,Quinn,Adams,Analyst,2020-04-26,Active,59600.00
+E00356,D010,Wesley,Morris,Specialist,2019-12-05,Active,52800.00
+E00357,D004,Jordan,Irwin,Consultant,2015-09-14,Active,108500.00
+E00358,D001,Jordan,Irwin,Coordinator,2022-07-03,Active,169700.00
+E00359,D007,Taylor,Patel,Coordinator,2018-09-22,On Leave,85500.00
+E00360,D010,Skyler,Jenkins,Senior Associate,2015-05-09,Active,90800.00

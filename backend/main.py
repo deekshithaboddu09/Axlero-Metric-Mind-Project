@@ -1,7 +1,7 @@
 import os
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 import psycopg
 
 
@@ -15,13 +15,20 @@ app = FastAPI()
 
 
 def get_db_connection():
-    return psycopg.connect(
-        host=os.getenv("DB_HOST"),
-        port=os.getenv("DB_PORT"),
-        dbname=os.getenv("DB_NAME"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-    )
+    try:
+        return psycopg.connect(
+            host=os.getenv("DB_HOST"),
+            port=os.getenv("DB_PORT"),
+            dbname=os.getenv("DB_NAME"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail="Database connection failed."
+        )
 
 
 @app.get("/")
@@ -42,20 +49,27 @@ def db_health_check():
 
         return {"database": "connected"}
 
-    except Exception as e:
-        return {
-            "database": "connection failed",
-            "error": str(e)
-        }
+    except HTTPException:
+        raise
+
+    except Exception:
+        raise HTTPException(
+            status_code=500,
+            detail="Database health check failed."
+        )
 
 
 @app.get("/sales")
-def get_sales():
+def get_sales(
+    region: str | None = None,
+    quarter: str | None = None
+):
     conn = get_db_connection()
 
     try:
         with conn.cursor() as cursor:
-            cursor.execute("""
+
+            query = """
                 SELECT
                     order_id,
                     order_date,
@@ -74,34 +88,87 @@ def get_sales():
                     margin,
                     quarter
                 FROM fct_sales
+            """
+
+            conditions = []
+            parameters = []
+
+            if region:
+                conditions.append("LOWER(region) = LOWER(%s)")
+                parameters.append(region)
+
+            if quarter:
+                conditions.append("UPPER(quarter) = UPPER(%s)")
+                parameters.append(quarter)
+
+            if conditions:
+                query += " WHERE " + " AND ".join(conditions)
+
+            query += """
                 ORDER BY order_date
                 LIMIT 20;
-            """)
+            """
+
+            cursor.execute(query, parameters)
 
             rows = cursor.fetchall()
 
-            columns = [description.name for description in cursor.description]
+            columns = [
+                description.name
+                for description in cursor.description
+            ]
 
-            return [dict(zip(columns, row)) for row in rows]
+            return [
+                dict(zip(columns, row))
+                for row in rows
+            ]
+
+    except Exception:
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to fetch sales data."
+        )
 
     finally:
         conn.close()
 
 
 @app.get("/summary")
-def get_summary():
+def get_summary(
+    region: str | None = None,
+    quarter: str | None = None
+):
     conn = get_db_connection()
 
     try:
         with conn.cursor() as cursor:
-            cursor.execute("""
+
+            query = """
                 SELECT
                     COUNT(*) AS total_orders,
                     COALESCE(SUM(revenue), 0) AS total_revenue,
                     COALESCE(SUM(total_cost), 0) AS total_cost,
                     COALESCE(SUM(margin), 0) AS total_margin
-                FROM fct_sales;
-            """)
+                FROM fct_sales
+            """
+
+            conditions = []
+            parameters = []
+
+            if region:
+                conditions.append("LOWER(region) = LOWER(%s)")
+                parameters.append(region)
+
+            if quarter:
+                conditions.append("UPPER(quarter) = UPPER(%s)")
+                parameters.append(quarter)
+
+            if conditions:
+                query += " WHERE " + " AND ".join(conditions)
+
+            query += ";"
+
+            cursor.execute(query, parameters)
 
             row = cursor.fetchone()
 
@@ -111,6 +178,12 @@ def get_summary():
                 "total_cost": float(row[2]),
                 "total_margin": float(row[3])
             }
+
+    except Exception:
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to generate sales summary."
+        )
 
     finally:
         conn.close()

@@ -24,7 +24,7 @@ def get_db_connection():
             password=os.getenv("DB_PASSWORD"),
         )
 
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=500,
             detail="Database connection failed."
@@ -62,6 +62,9 @@ def db_health_check():
 @app.get("/sales")
 def get_sales(
     region: str | None = None,
+    country: str | None = None,
+    product_name: str | None = None,
+    category: str | None = None,
     quarter: str | None = None
 ):
     conn = get_db_connection()
@@ -97,6 +100,18 @@ def get_sales(
                 conditions.append("LOWER(region) = LOWER(%s)")
                 parameters.append(region)
 
+            if country:
+                conditions.append("LOWER(country) = LOWER(%s)")
+                parameters.append(country)
+
+            if product_name:
+                conditions.append("LOWER(product_name) = LOWER(%s)")
+                parameters.append(product_name)
+
+            if category:
+                conditions.append("LOWER(category) = LOWER(%s)")
+                parameters.append(category)
+
             if quarter:
                 conditions.append("UPPER(quarter) = UPPER(%s)")
                 parameters.append(quarter)
@@ -123,6 +138,9 @@ def get_sales(
                 for row in rows
             ]
 
+    except HTTPException:
+        raise
+
     except Exception:
         raise HTTPException(
             status_code=500,
@@ -136,6 +154,9 @@ def get_sales(
 @app.get("/summary")
 def get_summary(
     region: str | None = None,
+    country: str | None = None,
+    product_name: str | None = None,
+    category: str | None = None,
     quarter: str | None = None
 ):
     conn = get_db_connection()
@@ -159,6 +180,18 @@ def get_summary(
                 conditions.append("LOWER(region) = LOWER(%s)")
                 parameters.append(region)
 
+            if country:
+                conditions.append("LOWER(country) = LOWER(%s)")
+                parameters.append(country)
+
+            if product_name:
+                conditions.append("LOWER(product_name) = LOWER(%s)")
+                parameters.append(product_name)
+
+            if category:
+                conditions.append("LOWER(category) = LOWER(%s)")
+                parameters.append(category)
+
             if quarter:
                 conditions.append("UPPER(quarter) = UPPER(%s)")
                 parameters.append(quarter)
@@ -178,6 +211,9 @@ def get_summary(
                 "total_cost": float(row[2]),
                 "total_margin": float(row[3])
             }
+
+    except HTTPException:
+        raise
 
     except Exception:
         raise HTTPException(

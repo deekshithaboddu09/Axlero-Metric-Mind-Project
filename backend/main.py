@@ -76,7 +76,9 @@ def get_sales(
     country: str | None = None,
     product_name: str | None = None,
     category: str | None = None,
-    quarter: str | None = None
+    quarter: str | None = None,
+    limit: int = 20,
+    offset: int = 0
 ):
     conn = get_db_connection()
 
@@ -132,8 +134,10 @@ def get_sales(
 
             query += """
                 ORDER BY order_date
-                LIMIT 20;
+                LIMIT %s OFFSET %s;
             """
+
+            parameters.extend([limit, offset])
 
             cursor.execute(query, parameters)
 

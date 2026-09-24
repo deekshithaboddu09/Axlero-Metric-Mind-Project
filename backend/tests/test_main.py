@@ -180,3 +180,21 @@ def test_combined_filters():
         assert record["region"].lower() == "europe"
         assert record["country"].lower() == "germany"
         assert record["quarter"].upper() == "Q2"
+
+
+def test_sales_pagination():
+    response = client.get("/sales?limit=5&offset=0")
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert len(data) == 5
+
+
+def test_sales_pagination_offset():
+    response = client.get("/sales?limit=5&offset=5")
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert len(data) == 5

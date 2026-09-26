@@ -17,7 +17,7 @@ type Sale = {
   product_name?: string;
   category?: string;
   revenue?: number | string;
-  cost?: number | string;
+  total_cost?: number | string;
   margin?: number | string;
   quarter?: string;
 };
@@ -244,7 +244,7 @@ export default function Home() {
               <tbody>
                 {sales.map((sale, index) => (
                   <tr key={`${sale.order_id ?? "order"}-${index}`}>
-                    <td>{sale.order_id ?? "-"}</td><td>{sale.order_date ?? "-"}</td><td>{sale.country ?? "-"}</td><td>{sale.region ?? "-"}</td><td>{sale.product_name ?? "-"}</td><td>{sale.category ?? "-"}</td><td>{formatMoney(sale.revenue)}</td><td>{formatMoney(sale.cost)}</td><td>{formatMoney(sale.margin)}</td><td>{sale.quarter ?? "-"}</td>
+                    <td>{sale.order_id ?? "-"}</td><td>{sale.order_date ?? "-"}</td><td>{sale.country ?? "-"}</td><td>{sale.region ?? "-"}</td><td>{sale.product_name ?? "-"}</td><td>{sale.category ?? "-"}</td><td>{formatMoney(sale.revenue)}</td><td>{formatMoney(sale.total_cost)}</td><td>{formatMoney(sale.margin)}</td><td>{sale.quarter ?? "-"}</td>
                   </tr>
                 ))}
                 {!loading && sales.length === 0 && <tr><td className="table-empty" colSpan={10}>{error ? "Sales records are unavailable." : "No sales records match these filters."}</td></tr>}

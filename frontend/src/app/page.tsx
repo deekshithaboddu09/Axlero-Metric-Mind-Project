@@ -87,6 +87,22 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  async function loadSummary(queryString = "", signal?: AbortSignal) {
+    const response = await fetch(`/backend/summary${queryString}`, { signal });
+    if (!response.ok) throw new Error(`Summary request failed (${response.status}).`);
+
+    const data: Summary = await response.json();
+    setSummary(data);
+  }
+
+  async function loadSales(queryString = "", signal?: AbortSignal) {
+    const response = await fetch(`/backend/sales${queryString}`, { signal });
+    if (!response.ok) throw new Error(`Sales request failed (${response.status}).`);
+
+    const data: unknown = await response.json();
+    setSales(getSales(data));
+  }
+
   useEffect(() => {
     const controller = new AbortController();
     const params = new URLSearchParams();
@@ -102,21 +118,10 @@ export default function Home() {
       setError("");
 
       try {
-        const [summaryResponse, salesResponse] = await Promise.all([
-          fetch(`/backend/summary${query}`, { signal: controller.signal }),
-          fetch(`/backend/sales${query}`, { signal: controller.signal }),
+        await Promise.all([
+          loadSummary(query, controller.signal),
+          loadSales(query, controller.signal),
         ]);
-
-        if (!summaryResponse.ok) throw new Error(`Summary request failed (${summaryResponse.status}).`);
-        if (!salesResponse.ok) throw new Error(`Sales request failed (${salesResponse.status}).`);
-
-        const [summaryData, salesData]: [Summary, unknown] = await Promise.all([
-          summaryResponse.json(),
-          salesResponse.json(),
-        ]);
-
-        setSummary(summaryData);
-        setSales(getSales(salesData));
       } catch (loadError) {
         if (controller.signal.aborted) return;
         setError(loadError instanceof Error ? loadError.message : "Unable to load dashboard data.");

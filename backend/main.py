@@ -9,17 +9,29 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 
+# ============================================================
+# ENVIRONMENT
+# ============================================================
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ENV_FILE = os.path.join(BASE_DIR, ".env")
 
 load_dotenv(ENV_FILE)
 
 
+# ============================================================
+# FASTAPI APP
+# ============================================================
+
 app = FastAPI(
     title="MetricMind Backend",
     version="0.1.0"
 )
 
+
+# ============================================================
+# CORS
+# ============================================================
 
 app.add_middleware(
     CORSMiddleware,
@@ -79,6 +91,14 @@ class ProductSummaryResponse(BaseModel):
 
 class RegionSummaryResponse(BaseModel):
     region: str
+    total_orders: int
+    total_revenue: float
+    total_cost: float
+    total_margin: float
+
+
+class QuarterSummaryResponse(BaseModel):
+    quarter: str
     total_orders: int
     total_revenue: float
     total_cost: float
@@ -218,7 +238,6 @@ def get_sales(
                 conditions.append(
                     "LOWER(region) = LOWER(%s)"
                 )
-
                 parameters.append(region)
 
             # Country filter
@@ -226,7 +245,6 @@ def get_sales(
                 conditions.append(
                     "LOWER(country) = LOWER(%s)"
                 )
-
                 parameters.append(country)
 
             # Product filter
@@ -234,7 +252,6 @@ def get_sales(
                 conditions.append(
                     "LOWER(product_name) = LOWER(%s)"
                 )
-
                 parameters.append(product_name)
 
             # Category filter
@@ -242,7 +259,6 @@ def get_sales(
                 conditions.append(
                     "LOWER(category) = LOWER(%s)"
                 )
-
                 parameters.append(category)
 
             # Quarter filter
@@ -250,7 +266,6 @@ def get_sales(
                 conditions.append(
                     "UPPER(quarter) = UPPER(%s)"
                 )
-
                 parameters.append(quarter)
 
             # WHERE clause
@@ -368,39 +383,33 @@ def get_summary(
                 conditions.append(
                     "LOWER(region) = LOWER(%s)"
                 )
-
                 parameters.append(region)
 
             if country:
                 conditions.append(
                     "LOWER(country) = LOWER(%s)"
                 )
-
                 parameters.append(country)
 
             if product_name:
                 conditions.append(
                     "LOWER(product_name) = LOWER(%s)"
                 )
-
                 parameters.append(product_name)
 
             if category:
                 conditions.append(
                     "LOWER(category) = LOWER(%s)"
                 )
-
                 parameters.append(category)
 
             if quarter:
                 conditions.append(
                     "UPPER(quarter) = UPPER(%s)"
                 )
-
                 parameters.append(quarter)
 
             if conditions:
-
                 query += (
                     " WHERE "
                     + " AND ".join(conditions)
@@ -505,31 +514,24 @@ def get_category_summary(
             parameters = []
 
             if region:
-
                 conditions.append(
                     "LOWER(region) = LOWER(%s)"
                 )
-
                 parameters.append(region)
 
             if country:
-
                 conditions.append(
                     "LOWER(country) = LOWER(%s)"
                 )
-
                 parameters.append(country)
 
             if quarter:
-
                 conditions.append(
                     "UPPER(quarter) = UPPER(%s)"
                 )
-
                 parameters.append(quarter)
 
             if conditions:
-
                 query += (
                     " WHERE "
                     + " AND ".join(conditions)
@@ -548,7 +550,6 @@ def get_category_summary(
             rows = cursor.fetchall()
 
             return [
-
                 CategorySummaryResponse(
                     category=row[0],
                     total_orders=int(row[1]),
@@ -556,7 +557,6 @@ def get_category_summary(
                     total_cost=float(row[3]),
                     total_margin=float(row[4])
                 )
-
                 for row in rows
             ]
 
@@ -619,39 +619,30 @@ def get_product_summary(
             parameters = []
 
             if region:
-
                 conditions.append(
                     "LOWER(region) = LOWER(%s)"
                 )
-
                 parameters.append(region)
 
             if country:
-
                 conditions.append(
                     "LOWER(country) = LOWER(%s)"
                 )
-
                 parameters.append(country)
 
             if category:
-
                 conditions.append(
                     "LOWER(category) = LOWER(%s)"
                 )
-
                 parameters.append(category)
 
             if quarter:
-
                 conditions.append(
                     "UPPER(quarter) = UPPER(%s)"
                 )
-
                 parameters.append(quarter)
 
             if conditions:
-
                 query += (
                     " WHERE "
                     + " AND ".join(conditions)
@@ -670,7 +661,6 @@ def get_product_summary(
             rows = cursor.fetchall()
 
             return [
-
                 ProductSummaryResponse(
                     product_name=row[0],
                     total_orders=int(row[1]),
@@ -678,7 +668,6 @@ def get_product_summary(
                     total_cost=float(row[3]),
                     total_margin=float(row[4])
                 )
-
                 for row in rows
             ]
 
@@ -740,31 +729,24 @@ def get_region_summary(
             parameters = []
 
             if country:
-
                 conditions.append(
                     "LOWER(country) = LOWER(%s)"
                 )
-
                 parameters.append(country)
 
             if category:
-
                 conditions.append(
                     "LOWER(category) = LOWER(%s)"
                 )
-
                 parameters.append(category)
 
             if quarter:
-
                 conditions.append(
                     "UPPER(quarter) = UPPER(%s)"
                 )
-
                 parameters.append(quarter)
 
             if conditions:
-
                 query += (
                     " WHERE "
                     + " AND ".join(conditions)
@@ -783,7 +765,6 @@ def get_region_summary(
             rows = cursor.fetchall()
 
             return [
-
                 RegionSummaryResponse(
                     region=row[0],
                     total_orders=int(row[1]),
@@ -791,7 +772,6 @@ def get_region_summary(
                     total_cost=float(row[3]),
                     total_margin=float(row[4])
                 )
-
                 for row in rows
             ]
 
@@ -803,6 +783,124 @@ def get_region_summary(
         raise HTTPException(
             status_code=500,
             detail=f"Failed to generate region summary: {str(e)}"
+        )
+
+    finally:
+
+        conn.close()
+
+
+# ============================================================
+# QUARTER SUMMARY
+# ============================================================
+
+@app.get(
+    "/summary/quarter",
+    response_model=list[QuarterSummaryResponse]
+)
+def get_quarter_summary(
+    region: str | None = None,
+    country: str | None = None,
+    product_name: str | None = None,
+    category: str | None = None
+):
+
+    conn = get_db_connection()
+
+    try:
+
+        with conn.cursor() as cursor:
+
+            query = """
+                SELECT
+                    quarter,
+                    COUNT(*) AS total_orders,
+                    COALESCE(
+                        SUM(revenue),
+                        0
+                    ) AS total_revenue,
+                    COALESCE(
+                        SUM(total_cost),
+                        0
+                    ) AS total_cost,
+                    COALESCE(
+                        SUM(margin),
+                        0
+                    ) AS total_margin
+                FROM fct_sales
+            """
+
+            conditions = []
+            parameters = []
+
+            if region:
+                conditions.append(
+                    "LOWER(region) = LOWER(%s)"
+                )
+                parameters.append(region)
+
+            if country:
+                conditions.append(
+                    "LOWER(country) = LOWER(%s)"
+                )
+                parameters.append(country)
+
+            if product_name:
+                conditions.append(
+                    "LOWER(product_name) = LOWER(%s)"
+                )
+                parameters.append(product_name)
+
+            if category:
+                conditions.append(
+                    "LOWER(category) = LOWER(%s)"
+                )
+                parameters.append(category)
+
+            if conditions:
+                query += (
+                    " WHERE "
+                    + " AND ".join(conditions)
+                )
+
+            query += """
+                GROUP BY quarter
+                ORDER BY
+                    CASE quarter
+                        WHEN 'Q1' THEN 1
+                        WHEN 'Q2' THEN 2
+                        WHEN 'Q3' THEN 3
+                        WHEN 'Q4' THEN 4
+                        ELSE 5
+                    END
+            """
+
+            cursor.execute(
+                query,
+                parameters
+            )
+
+            rows = cursor.fetchall()
+
+            return [
+                QuarterSummaryResponse(
+                    quarter=row[0],
+                    total_orders=int(row[1]),
+                    total_revenue=float(row[2]),
+                    total_cost=float(row[3]),
+                    total_margin=float(row[4])
+                )
+                for row in rows
+            ]
+
+    except HTTPException:
+        raise
+
+    except Exception as e:
+
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate quarter summary: {str(e)}"
         )
 
     finally:

@@ -1,6 +1,5 @@
 import os
 from datetime import date
-from decimal import Decimal
 
 import psycopg
 from dotenv import load_dotenv
@@ -9,42 +8,35 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 
-# ============================================================
+# =========================================================
 # ENVIRONMENT
-# ============================================================
+# =========================================================
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ENV_FILE = os.path.join(BASE_DIR, ".env")
-
-load_dotenv(ENV_FILE)
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 
-# ============================================================
+# =========================================================
 # FASTAPI APP
-# ============================================================
+# =========================================================
 
-app = FastAPI(
-    title="MetricMind Backend",
-    version="0.1.0"
-)
+app = FastAPI(title="MetricMind Backend")
 
-
-# ============================================================
-# CORS
-# ============================================================
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-# ============================================================
+# =========================================================
 # RESPONSE MODELS
-# ============================================================
+# =========================================================
 
 class SalesResponse(BaseModel):
     order_id: str
@@ -81,33 +73,18 @@ class CategorySummaryResponse(BaseModel):
     total_margin: float
 
 
-class ProductSummaryResponse(BaseModel):
-    product_name: str
-    total_orders: int
-    total_revenue: float
-    total_cost: float
-    total_margin: float
+class QuestionCreate(BaseModel):
+    question: str
 
 
-class RegionSummaryResponse(BaseModel):
-    region: str
-    total_orders: int
-    total_revenue: float
-    total_cost: float
-    total_margin: float
+class QuestionResponse(BaseModel):
+    id: int
+    question: str
 
 
-class QuarterSummaryResponse(BaseModel):
-    quarter: str
-    total_orders: int
-    total_revenue: float
-    total_cost: float
-    total_margin: float
-
-
-# ============================================================
+# =========================================================
 # DATABASE CONNECTION
-# ============================================================
+# =========================================================
 
 def get_db_connection():
     try:
@@ -118,791 +95,428 @@ def get_db_connection():
             user=os.getenv("DB_USER"),
             password=os.getenv("DB_PASSWORD"),
         )
-
-    except Exception as e:
+    except Exception as exc:
         raise HTTPException(
             status_code=500,
-            detail=f"Database connection failed: {str(e)}"
+            detail=f"Database connection failed: {exc}",
         )
 
 
-# ============================================================
+# =========================================================
 # ROOT
-# ============================================================
+# =========================================================
 
 @app.get("/")
-def home():
+def root():
     return {
-        "message": "MetricMind Backend is running!"
+        "message": "MetricMind backend is running",
+        "status": "ok",
     }
 
 
-# ============================================================
-# HEALTH CHECK
-# ============================================================
+# =========================================================
+# HEALTH
+# =========================================================
 
 @app.get("/health")
-def health_check():
+def health():
     return {
         "status": "healthy"
     }
 
 
-# ============================================================
-# DATABASE HEALTH CHECK
-# ============================================================
+# =========================================================
+# DATABASE HEALTH
+# =========================================================
 
 @app.get("/db-health")
-def db_health_check():
-
-    conn = None
-
+def db_health():
     try:
-        conn = get_db_connection()
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1")
+                cur.fetchone()
 
         return {
-            "database": "connected"
+            "status": "healthy",
+            "database": "connected",
         }
 
-    except HTTPException:
-        raise
-
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Database health check failed: {str(e)}"
-        )
-
-    finally:
-        if conn:
-            conn.close()
+    except Exception as exc:
+        return {
+            "status": "unhealthy",
+            "database": "disconnected",
+            "error": str(exc),
+        }
 
 
-# ============================================================
+# =========================================================
 # SALES API
-# ============================================================
+# =========================================================
 
 @app.get(
     "/sales",
     response_model=list[SalesResponse]
 )
 def get_sales(
-    region: str | None = None,
-    country: str | None = None,
-    product_name: str | None = None,
-    category: str | None = None,
-    quarter: str | None = None,
-    limit: int = Query(
-        20,
-        ge=1,
-        le=100
-    ),
-    offset: int = Query(
-        0,
-        ge=0
-    )
+    region: str | None = Query(default=None),
+    country: str | None = Query(default=None),
+    product_name: str | None = Query(default=None),
+    category: str | None = Query(default=None),
+    quarter: str | None = Query(default=None),
+    limit: int = Query(default=20, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
 ):
 
-    conn = get_db_connection()
+    query = """
+        SELECT
+            order_id,
+            order_date,
+            customer_id,
+            country,
+            region,
+            product_id,
+            product_name,
+            category,
+            quantity,
+            unit_price,
+            revenue,
+            material_cost,
+            shipping_cost,
+            total_cost,
+            margin,
+            quarter
+        FROM fct_sales
+        WHERE 1=1
+    """
+
+    params = []
+
+    if region:
+        query += " AND region = %s"
+        params.append(region)
+
+    if country:
+        query += " AND country = %s"
+        params.append(country)
+
+    if product_name:
+        query += " AND product_name = %s"
+        params.append(product_name)
+
+    if category:
+        query += " AND category = %s"
+        params.append(category)
+
+    if quarter:
+        query += " AND quarter = %s"
+        params.append(quarter)
+
+    query += """
+        ORDER BY order_date, order_id
+        LIMIT %s
+        OFFSET %s
+    """
+
+    params.extend([limit, offset])
 
     try:
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
 
-        with conn.cursor() as cursor:
+                cur.execute(query, params)
 
-            query = """
-                SELECT
-                    order_id,
-                    order_date,
-                    customer_id,
-                    country,
-                    region,
-                    product_id,
-                    product_name,
-                    category,
-                    quantity,
-                    unit_price,
-                    revenue,
-                    material_cost,
-                    shipping_cost,
-                    total_cost,
-                    margin,
-                    quarter
-                FROM fct_sales
-            """
+                rows = cur.fetchall()
 
-            conditions = []
-            parameters = []
-
-            # Region filter
-            if region:
-                conditions.append(
-                    "LOWER(region) = LOWER(%s)"
-                )
-                parameters.append(region)
-
-            # Country filter
-            if country:
-                conditions.append(
-                    "LOWER(country) = LOWER(%s)"
-                )
-                parameters.append(country)
-
-            # Product filter
-            if product_name:
-                conditions.append(
-                    "LOWER(product_name) = LOWER(%s)"
-                )
-                parameters.append(product_name)
-
-            # Category filter
-            if category:
-                conditions.append(
-                    "LOWER(category) = LOWER(%s)"
-                )
-                parameters.append(category)
-
-            # Quarter filter
-            if quarter:
-                conditions.append(
-                    "UPPER(quarter) = UPPER(%s)"
-                )
-                parameters.append(quarter)
-
-            # WHERE clause
-            if conditions:
-                query += (
-                    " WHERE "
-                    + " AND ".join(conditions)
-                )
-
-            # Pagination
-            query += """
-                ORDER BY order_date
-                LIMIT %s
-                OFFSET %s
-            """
-
-            parameters.extend(
-                [limit, offset]
+        return [
+            SalesResponse(
+                order_id=row[0],
+                order_date=row[1],
+                customer_id=row[2],
+                country=row[3],
+                region=row[4],
+                product_id=row[5],
+                product_name=row[6],
+                category=row[7],
+                quantity=row[8],
+                unit_price=float(row[9]),
+                revenue=float(row[10]),
+                material_cost=float(row[11]),
+                shipping_cost=float(row[12]),
+                total_cost=float(row[13]),
+                margin=float(row[14]),
+                quarter=row[15],
             )
+            for row in rows
+        ]
 
-            cursor.execute(
-                query,
-                parameters
-            )
-
-            rows = cursor.fetchall()
-
-            columns = [
-                description.name
-                for description in cursor.description
-            ]
-
-            sales_data = []
-
-            for row in rows:
-
-                record = dict(
-                    zip(
-                        columns,
-                        row
-                    )
-                )
-
-                for key, value in record.items():
-
-                    if isinstance(
-                        value,
-                        Decimal
-                    ):
-                        record[key] = float(value)
-
-                sales_data.append(record)
-
-            return sales_data
-
-    except HTTPException:
-        raise
-
-    except Exception as e:
-
+    except Exception as exc:
         raise HTTPException(
             status_code=500,
-            detail=f"Failed to fetch sales data: {str(e)}"
+            detail=f"Sales request failed: {exc}",
         )
 
-    finally:
 
-        conn.close()
-
-
-# ============================================================
-# OVERALL SUMMARY
-# ============================================================
+# =========================================================
+# SUMMARY API
+# =========================================================
 
 @app.get(
     "/summary",
     response_model=SummaryResponse
 )
 def get_summary(
-    region: str | None = None,
-    country: str | None = None,
-    product_name: str | None = None,
-    category: str | None = None,
-    quarter: str | None = None
+    region: str | None = Query(default=None),
+    country: str | None = Query(default=None),
+    product_name: str | None = Query(default=None),
+    category: str | None = Query(default=None),
+    quarter: str | None = Query(default=None),
 ):
 
-    conn = get_db_connection()
+    query = """
+        SELECT
+            COUNT(*) AS total_orders,
+            COALESCE(SUM(revenue), 0) AS total_revenue,
+            COALESCE(SUM(total_cost), 0) AS total_cost,
+            COALESCE(SUM(margin), 0) AS total_margin
+        FROM fct_sales
+        WHERE 1=1
+    """
+
+    params = []
+
+    if region:
+        query += " AND region = %s"
+        params.append(region)
+
+    if country:
+        query += " AND country = %s"
+        params.append(country)
+
+    if product_name:
+        query += " AND product_name = %s"
+        params.append(product_name)
+
+    if category:
+        query += " AND category = %s"
+        params.append(category)
+
+    if quarter:
+        query += " AND quarter = %s"
+        params.append(quarter)
 
     try:
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
 
-        with conn.cursor() as cursor:
+                cur.execute(query, params)
 
-            query = """
-                SELECT
-                    COUNT(*) AS total_orders,
-                    COALESCE(
-                        SUM(revenue),
-                        0
-                    ) AS total_revenue,
-                    COALESCE(
-                        SUM(total_cost),
-                        0
-                    ) AS total_cost,
-                    COALESCE(
-                        SUM(margin),
-                        0
-                    ) AS total_margin
-                FROM fct_sales
-            """
+                row = cur.fetchone()
 
-            conditions = []
-            parameters = []
+        total_orders = int(row[0] or 0)
+        total_revenue = float(row[1] or 0)
+        total_cost = float(row[2] or 0)
+        total_margin = float(row[3] or 0)
 
-            if region:
-                conditions.append(
-                    "LOWER(region) = LOWER(%s)"
-                )
-                parameters.append(region)
-
-            if country:
-                conditions.append(
-                    "LOWER(country) = LOWER(%s)"
-                )
-                parameters.append(country)
-
-            if product_name:
-                conditions.append(
-                    "LOWER(product_name) = LOWER(%s)"
-                )
-                parameters.append(product_name)
-
-            if category:
-                conditions.append(
-                    "LOWER(category) = LOWER(%s)"
-                )
-                parameters.append(category)
-
-            if quarter:
-                conditions.append(
-                    "UPPER(quarter) = UPPER(%s)"
-                )
-                parameters.append(quarter)
-
-            if conditions:
-                query += (
-                    " WHERE "
-                    + " AND ".join(conditions)
-                )
-
-            cursor.execute(
-                query,
-                parameters
-            )
-
-            row = cursor.fetchone()
-
-            total_orders = int(row[0])
-
-            total_revenue = float(
-                row[1]
-            )
-
-            total_cost = float(
-                row[2]
-            )
-
-            total_margin = float(
-                row[3]
-            )
-
-            margin_percentage = (
-                (
-                    total_margin
-                    / total_revenue
-                ) * 100
-                if total_revenue > 0
-                else 0
-            )
-
-            return SummaryResponse(
-                total_orders=total_orders,
-                total_revenue=total_revenue,
-                total_cost=total_cost,
-                total_margin=total_margin,
-                margin_percentage=round(
-                    margin_percentage,
-                    2
-                )
-            )
-
-    except HTTPException:
-        raise
-
-    except Exception as e:
-
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to generate sales summary: {str(e)}"
+        margin_percentage = (
+            (total_margin / total_revenue) * 100
+            if total_revenue
+            else 0
         )
 
-    finally:
+        return SummaryResponse(
+            total_orders=total_orders,
+            total_revenue=total_revenue,
+            total_cost=total_cost,
+            total_margin=total_margin,
+            margin_percentage=round(
+                margin_percentage,
+                2
+            ),
+        )
 
-        conn.close()
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Summary request failed: {exc}",
+        )
 
 
-# ============================================================
-# CATEGORY SUMMARY
-# ============================================================
+# =========================================================
+# CATEGORY SUMMARY API
+# =========================================================
 
 @app.get(
     "/summary/category",
     response_model=list[CategorySummaryResponse]
 )
 def get_category_summary(
-    region: str | None = None,
-    country: str | None = None,
-    quarter: str | None = None
+    region: str | None = Query(default=None),
+    country: str | None = Query(default=None),
+    quarter: str | None = Query(default=None),
 ):
 
-    conn = get_db_connection()
+    query = """
+        SELECT
+            category,
+            COUNT(*) AS total_orders,
+            COALESCE(SUM(revenue), 0) AS total_revenue,
+            COALESCE(SUM(total_cost), 0) AS total_cost,
+            COALESCE(SUM(margin), 0) AS total_margin
+        FROM fct_sales
+        WHERE 1=1
+    """
+
+    params = []
+
+    if region:
+        query += " AND region = %s"
+        params.append(region)
+
+    if country:
+        query += " AND country = %s"
+        params.append(country)
+
+    if quarter:
+        query += " AND quarter = %s"
+        params.append(quarter)
+
+    query += """
+        GROUP BY category
+        ORDER BY total_revenue DESC
+    """
 
     try:
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
 
-        with conn.cursor() as cursor:
+                cur.execute(query, params)
 
-            query = """
-                SELECT
-                    category,
-                    COUNT(*) AS total_orders,
-                    COALESCE(
-                        SUM(revenue),
-                        0
-                    ) AS total_revenue,
-                    COALESCE(
-                        SUM(total_cost),
-                        0
-                    ) AS total_cost,
-                    COALESCE(
-                        SUM(margin),
-                        0
-                    ) AS total_margin
-                FROM fct_sales
-            """
+                rows = cur.fetchall()
 
-            conditions = []
-            parameters = []
-
-            if region:
-                conditions.append(
-                    "LOWER(region) = LOWER(%s)"
-                )
-                parameters.append(region)
-
-            if country:
-                conditions.append(
-                    "LOWER(country) = LOWER(%s)"
-                )
-                parameters.append(country)
-
-            if quarter:
-                conditions.append(
-                    "UPPER(quarter) = UPPER(%s)"
-                )
-                parameters.append(quarter)
-
-            if conditions:
-                query += (
-                    " WHERE "
-                    + " AND ".join(conditions)
-                )
-
-            query += """
-                GROUP BY category
-                ORDER BY total_revenue DESC
-            """
-
-            cursor.execute(
-                query,
-                parameters
+        return [
+            CategorySummaryResponse(
+                category=row[0],
+                total_orders=int(row[1]),
+                total_revenue=float(row[2]),
+                total_cost=float(row[3]),
+                total_margin=float(row[4]),
             )
+            for row in rows
+        ]
 
-            rows = cursor.fetchall()
-
-            return [
-                CategorySummaryResponse(
-                    category=row[0],
-                    total_orders=int(row[1]),
-                    total_revenue=float(row[2]),
-                    total_cost=float(row[3]),
-                    total_margin=float(row[4])
-                )
-                for row in rows
-            ]
-
-    except HTTPException:
-        raise
-
-    except Exception as e:
-
+    except Exception as exc:
         raise HTTPException(
             status_code=500,
-            detail=f"Failed to generate category summary: {str(e)}"
+            detail=f"Category summary request failed: {exc}",
         )
 
-    finally:
 
-        conn.close()
+# =========================================================
+# QUESTIONS API - SAVE QUESTION
+# =========================================================
+
+@app.post(
+    "/questions",
+    response_model=QuestionResponse
+)
+def create_question(payload: QuestionCreate):
+
+    question = payload.question.strip()
+
+    if not question:
+        raise HTTPException(
+            status_code=400,
+            detail="Question cannot be empty",
+        )
+
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+
+                cur.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS saved_questions (
+                        id SERIAL PRIMARY KEY,
+                        question TEXT NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                    """
+                )
+
+                cur.execute(
+                    """
+                    INSERT INTO saved_questions (question)
+                    VALUES (%s)
+                    RETURNING id, question
+                    """,
+                    (question,),
+                )
+
+                row = cur.fetchone()
+
+                conn.commit()
+
+        return QuestionResponse(
+            id=row[0],
+            question=row[1],
+        )
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Question save failed: {exc}",
+        )
 
 
-# ============================================================
-# PRODUCT SUMMARY
-# ============================================================
+# =========================================================
+# QUESTIONS API - GET SAVED QUESTIONS
+# =========================================================
 
 @app.get(
-    "/summary/product",
-    response_model=list[ProductSummaryResponse]
+    "/questions",
+    response_model=list[QuestionResponse]
 )
-def get_product_summary(
-    region: str | None = None,
-    country: str | None = None,
-    category: str | None = None,
-    quarter: str | None = None
-):
-
-    conn = get_db_connection()
+def get_questions():
 
     try:
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
 
-        with conn.cursor() as cursor:
-
-            query = """
-                SELECT
-                    product_name,
-                    COUNT(*) AS total_orders,
-                    COALESCE(
-                        SUM(revenue),
-                        0
-                    ) AS total_revenue,
-                    COALESCE(
-                        SUM(total_cost),
-                        0
-                    ) AS total_cost,
-                    COALESCE(
-                        SUM(margin),
-                        0
-                    ) AS total_margin
-                FROM fct_sales
-            """
-
-            conditions = []
-            parameters = []
-
-            if region:
-                conditions.append(
-                    "LOWER(region) = LOWER(%s)"
-                )
-                parameters.append(region)
-
-            if country:
-                conditions.append(
-                    "LOWER(country) = LOWER(%s)"
-                )
-                parameters.append(country)
-
-            if category:
-                conditions.append(
-                    "LOWER(category) = LOWER(%s)"
-                )
-                parameters.append(category)
-
-            if quarter:
-                conditions.append(
-                    "UPPER(quarter) = UPPER(%s)"
-                )
-                parameters.append(quarter)
-
-            if conditions:
-                query += (
-                    " WHERE "
-                    + " AND ".join(conditions)
+                cur.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS saved_questions (
+                        id SERIAL PRIMARY KEY,
+                        question TEXT NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                    """
                 )
 
-            query += """
-                GROUP BY product_name
-                ORDER BY total_revenue DESC
-            """
+                cur.execute(
+                    """
+                    SELECT
+                        id,
+                        question
+                    FROM saved_questions
+                    ORDER BY created_at DESC, id DESC
+                    """
+                )
 
-            cursor.execute(
-                query,
-                parameters
+                rows = cur.fetchall()
+
+                conn.commit()
+
+        return [
+            QuestionResponse(
+                id=row[0],
+                question=row[1],
             )
+            for row in rows
+        ]
 
-            rows = cursor.fetchall()
-
-            return [
-                ProductSummaryResponse(
-                    product_name=row[0],
-                    total_orders=int(row[1]),
-                    total_revenue=float(row[2]),
-                    total_cost=float(row[3]),
-                    total_margin=float(row[4])
-                )
-                for row in rows
-            ]
-
-    except HTTPException:
-        raise
-
-    except Exception as e:
-
+    except Exception as exc:
         raise HTTPException(
             status_code=500,
-            detail=f"Failed to generate product summary: {str(e)}"
+            detail=f"Questions request failed: {exc}",
         )
-
-    finally:
-
-        conn.close()
-
-
-# ============================================================
-# REGION SUMMARY
-# ============================================================
-
-@app.get(
-    "/summary/region",
-    response_model=list[RegionSummaryResponse]
-)
-def get_region_summary(
-    country: str | None = None,
-    category: str | None = None,
-    quarter: str | None = None
-):
-
-    conn = get_db_connection()
-
-    try:
-
-        with conn.cursor() as cursor:
-
-            query = """
-                SELECT
-                    region,
-                    COUNT(*) AS total_orders,
-                    COALESCE(
-                        SUM(revenue),
-                        0
-                    ) AS total_revenue,
-                    COALESCE(
-                        SUM(total_cost),
-                        0
-                    ) AS total_cost,
-                    COALESCE(
-                        SUM(margin),
-                        0
-                    ) AS total_margin
-                FROM fct_sales
-            """
-
-            conditions = []
-            parameters = []
-
-            if country:
-                conditions.append(
-                    "LOWER(country) = LOWER(%s)"
-                )
-                parameters.append(country)
-
-            if category:
-                conditions.append(
-                    "LOWER(category) = LOWER(%s)"
-                )
-                parameters.append(category)
-
-            if quarter:
-                conditions.append(
-                    "UPPER(quarter) = UPPER(%s)"
-                )
-                parameters.append(quarter)
-
-            if conditions:
-                query += (
-                    " WHERE "
-                    + " AND ".join(conditions)
-                )
-
-            query += """
-                GROUP BY region
-                ORDER BY total_revenue DESC
-            """
-
-            cursor.execute(
-                query,
-                parameters
-            )
-
-            rows = cursor.fetchall()
-
-            return [
-                RegionSummaryResponse(
-                    region=row[0],
-                    total_orders=int(row[1]),
-                    total_revenue=float(row[2]),
-                    total_cost=float(row[3]),
-                    total_margin=float(row[4])
-                )
-                for row in rows
-            ]
-
-    except HTTPException:
-        raise
-
-    except Exception as e:
-
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to generate region summary: {str(e)}"
-        )
-
-    finally:
-
-        conn.close()
-
-
-# ============================================================
-# QUARTER SUMMARY
-# ============================================================
-
-@app.get(
-    "/summary/quarter",
-    response_model=list[QuarterSummaryResponse]
-)
-def get_quarter_summary(
-    region: str | None = None,
-    country: str | None = None,
-    product_name: str | None = None,
-    category: str | None = None
-):
-
-    conn = get_db_connection()
-
-    try:
-
-        with conn.cursor() as cursor:
-
-            query = """
-                SELECT
-                    quarter,
-                    COUNT(*) AS total_orders,
-                    COALESCE(
-                        SUM(revenue),
-                        0
-                    ) AS total_revenue,
-                    COALESCE(
-                        SUM(total_cost),
-                        0
-                    ) AS total_cost,
-                    COALESCE(
-                        SUM(margin),
-                        0
-                    ) AS total_margin
-                FROM fct_sales
-            """
-
-            conditions = []
-            parameters = []
-
-            if region:
-                conditions.append(
-                    "LOWER(region) = LOWER(%s)"
-                )
-                parameters.append(region)
-
-            if country:
-                conditions.append(
-                    "LOWER(country) = LOWER(%s)"
-                )
-                parameters.append(country)
-
-            if product_name:
-                conditions.append(
-                    "LOWER(product_name) = LOWER(%s)"
-                )
-                parameters.append(product_name)
-
-            if category:
-                conditions.append(
-                    "LOWER(category) = LOWER(%s)"
-                )
-                parameters.append(category)
-
-            if conditions:
-                query += (
-                    " WHERE "
-                    + " AND ".join(conditions)
-                )
-
-            query += """
-                GROUP BY quarter
-                ORDER BY
-                    CASE quarter
-                        WHEN 'Q1' THEN 1
-                        WHEN 'Q2' THEN 2
-                        WHEN 'Q3' THEN 3
-                        WHEN 'Q4' THEN 4
-                        ELSE 5
-                    END
-            """
-
-            cursor.execute(
-                query,
-                parameters
-            )
-
-            rows = cursor.fetchall()
-
-            return [
-                QuarterSummaryResponse(
-                    quarter=row[0],
-                    total_orders=int(row[1]),
-                    total_revenue=float(row[2]),
-                    total_cost=float(row[3]),
-                    total_margin=float(row[4])
-                )
-                for row in rows
-            ]
-
-    except HTTPException:
-        raise
-
-    except Exception as e:
-
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to generate quarter summary: {str(e)}"
-        )
-
-    finally:
-
-        conn.close()

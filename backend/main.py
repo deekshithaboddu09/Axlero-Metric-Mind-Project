@@ -82,6 +82,11 @@ class QuestionResponse(BaseModel):
     question: str
 
 
+class QuestionAnswerResponse(BaseModel):
+    question: str
+    answer: str
+
+
 # =========================================================
 # DATABASE CONNECTION
 # =========================================================
@@ -164,7 +169,7 @@ def get_sales(
     product_name: str | None = Query(default=None),
     category: str | None = Query(default=None),
     quarter: str | None = Query(default=None),
-    limit: int = Query(default=20, ge=1, le=100),
+    limit: int = Query(default=20, ge=1, le=1000),
     offset: int = Query(default=0, ge=0),
 ):
 
@@ -520,3 +525,380 @@ def get_questions():
             status_code=500,
             detail=f"Questions request failed: {exc}",
         )
+
+
+# =========================================================
+# ASK METRICMIND - QUESTION ANSWER API
+# =========================================================
+
+@app.post(
+    "/questions/answer",
+    response_model=QuestionAnswerResponse
+)
+def answer_question(payload: QuestionCreate):
+
+    question = payload.question.strip()
+
+    if not question:
+        raise HTTPException(
+            status_code=400,
+            detail="Question cannot be empty",
+        )
+
+    question_lower = question.lower()
+
+    # -----------------------------------------------------
+    # QUARTER REVENUE QUESTIONS
+    # -----------------------------------------------------
+
+    if (
+        "quarter" in question_lower
+        and "revenue" in question_lower
+        and (
+            "highest" in question_lower
+            or "maximum" in question_lower
+            or "most" in question_lower
+        )
+    ):
+
+        query = """
+            SELECT
+                quarter,
+                COALESCE(SUM(revenue), 0) AS total_revenue
+            FROM fct_sales
+            GROUP BY quarter
+            ORDER BY total_revenue DESC
+            LIMIT 1
+        """
+
+        try:
+            with get_db_connection() as conn:
+                with conn.cursor() as cur:
+
+                    cur.execute(query)
+
+                    row = cur.fetchone()
+
+            if not row:
+                answer = "No sales data is available to answer this question."
+
+            else:
+                quarter = row[0]
+                revenue = float(row[1])
+
+                answer = (
+                    f"{quarter} had the highest revenue "
+                    f"with ${revenue:,.2f}."
+                )
+
+            return QuestionAnswerResponse(
+                question=question,
+                answer=answer,
+            )
+
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Question analysis failed: {exc}",
+            )
+
+    # -----------------------------------------------------
+    # QUARTER REVENUE - LOWEST
+    # -----------------------------------------------------
+
+    if (
+        "quarter" in question_lower
+        and "revenue" in question_lower
+        and (
+            "lowest" in question_lower
+            or "minimum" in question_lower
+            or "least" in question_lower
+        )
+    ):
+
+        query = """
+            SELECT
+                quarter,
+                COALESCE(SUM(revenue), 0) AS total_revenue
+            FROM fct_sales
+            GROUP BY quarter
+            ORDER BY total_revenue ASC
+            LIMIT 1
+        """
+
+        try:
+            with get_db_connection() as conn:
+                with conn.cursor() as cur:
+
+                    cur.execute(query)
+
+                    row = cur.fetchone()
+
+            if not row:
+                answer = "No sales data is available to answer this question."
+
+            else:
+                quarter = row[0]
+                revenue = float(row[1])
+
+                answer = (
+                    f"{quarter} had the lowest revenue "
+                    f"with ${revenue:,.2f}."
+                )
+
+            return QuestionAnswerResponse(
+                question=question,
+                answer=answer,
+            )
+
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Question analysis failed: {exc}",
+            )
+
+    # -----------------------------------------------------
+    # QUARTER MARGIN QUESTIONS - HIGHEST
+    # -----------------------------------------------------
+
+    if (
+        "quarter" in question_lower
+        and "margin" in question_lower
+        and (
+            "highest" in question_lower
+            or "maximum" in question_lower
+            or "most" in question_lower
+        )
+    ):
+
+        query = """
+            SELECT
+                quarter,
+                COALESCE(SUM(margin), 0) AS total_margin
+            FROM fct_sales
+            GROUP BY quarter
+            ORDER BY total_margin DESC
+            LIMIT 1
+        """
+
+        try:
+            with get_db_connection() as conn:
+                with conn.cursor() as cur:
+
+                    cur.execute(query)
+
+                    row = cur.fetchone()
+
+            if not row:
+                answer = "No sales data is available to answer this question."
+
+            else:
+                quarter = row[0]
+                margin = float(row[1])
+
+                answer = (
+                    f"{quarter} had the highest margin "
+                    f"with ${margin:,.2f}."
+                )
+
+            return QuestionAnswerResponse(
+                question=question,
+                answer=answer,
+            )
+
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Question analysis failed: {exc}",
+            )
+
+    # -----------------------------------------------------
+    # QUARTER MARGIN QUESTIONS - LOWEST
+    # -----------------------------------------------------
+
+    if (
+        "quarter" in question_lower
+        and "margin" in question_lower
+        and (
+            "lowest" in question_lower
+            or "minimum" in question_lower
+            or "least" in question_lower
+        )
+    ):
+
+        query = """
+            SELECT
+                quarter,
+                COALESCE(SUM(margin), 0) AS total_margin
+            FROM fct_sales
+            GROUP BY quarter
+            ORDER BY total_margin ASC
+            LIMIT 1
+        """
+
+        try:
+            with get_db_connection() as conn:
+                with conn.cursor() as cur:
+
+                    cur.execute(query)
+
+                    row = cur.fetchone()
+
+            if not row:
+                answer = "No sales data is available to answer this question."
+
+            else:
+                quarter = row[0]
+                margin = float(row[1])
+
+                answer = (
+                    f"{quarter} had the lowest margin "
+                    f"with ${margin:,.2f}."
+                )
+
+            return QuestionAnswerResponse(
+                question=question,
+                answer=answer,
+            )
+
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Question analysis failed: {exc}",
+            )
+
+    # -----------------------------------------------------
+    # TOTAL REVENUE
+    # -----------------------------------------------------
+
+    if (
+        "revenue" in question_lower
+        and "total" in question_lower
+    ):
+
+        query = """
+            SELECT
+                COALESCE(SUM(revenue), 0)
+            FROM fct_sales
+        """
+
+        try:
+            with get_db_connection() as conn:
+                with conn.cursor() as cur:
+
+                    cur.execute(query)
+
+                    row = cur.fetchone()
+
+            revenue = float(row[0] or 0)
+
+            answer = (
+                f"Total revenue is ${revenue:,.2f}."
+            )
+
+            return QuestionAnswerResponse(
+                question=question,
+                answer=answer,
+            )
+
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Question analysis failed: {exc}",
+            )
+
+    # -----------------------------------------------------
+    # TOTAL MARGIN
+    # -----------------------------------------------------
+
+    if (
+        "margin" in question_lower
+        and "total" in question_lower
+    ):
+
+        query = """
+            SELECT
+                COALESCE(SUM(margin), 0)
+            FROM fct_sales
+        """
+
+        try:
+            with get_db_connection() as conn:
+                with conn.cursor() as cur:
+
+                    cur.execute(query)
+
+                    row = cur.fetchone()
+
+            margin = float(row[0] or 0)
+
+            answer = (
+                f"Total margin is ${margin:,.2f}."
+            )
+
+            return QuestionAnswerResponse(
+                question=question,
+                answer=answer,
+            )
+
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Question analysis failed: {exc}",
+            )
+
+    # -----------------------------------------------------
+    # TOTAL ORDERS
+    # -----------------------------------------------------
+
+    if (
+        "orders" in question_lower
+        and (
+            "total" in question_lower
+            or "how many" in question_lower
+            or "number" in question_lower
+        )
+    ):
+
+        query = """
+            SELECT COUNT(*)
+            FROM fct_sales
+        """
+
+        try:
+            with get_db_connection() as conn:
+                with conn.cursor() as cur:
+
+                    cur.execute(query)
+
+                    row = cur.fetchone()
+
+            total_orders = int(row[0] or 0)
+
+            answer = (
+                f"Total number of orders is {total_orders}."
+            )
+
+            return QuestionAnswerResponse(
+                question=question,
+                answer=answer,
+            )
+
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Question analysis failed: {exc}",
+            )
+
+    # -----------------------------------------------------
+    # UNSUPPORTED QUESTION
+    # -----------------------------------------------------
+
+    return QuestionAnswerResponse(
+        question=question,
+        answer=(
+            "I can currently answer questions about total revenue, "
+            "total margin, total orders, and highest or lowest "
+            "quarterly revenue or margin."
+        ),
+    )

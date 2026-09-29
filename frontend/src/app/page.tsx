@@ -22,17 +22,17 @@ type Sale = {
   quarter?: string;
 };
 
-type QuarterRevenue = {
-  quarter: string;
-  revenue: number;
-};
-
 type Filters = {
   region: string;
   country: string;
   product_name: string;
   category: string;
   quarter: string;
+};
+
+type QuestionAnswer = {
+  question: string;
+  answer: string;
 };
 
 const initialSummary: Summary = {
@@ -49,9 +49,21 @@ const filterDefinitions: {
 }[] = [
   { key: "region", label: "Region", examples: ["Europe"] },
   { key: "country", label: "Country", examples: ["Germany"] },
-  { key: "product_name", label: "Product", examples: ["Analytics Suite"] },
-  { key: "category", label: "Category", examples: ["Software"] },
-  { key: "quarter", label: "Quarter", examples: ["Q1", "Q2", "Q3", "Q4"] },
+  {
+    key: "product_name",
+    label: "Product",
+    examples: ["Analytics Suite"],
+  },
+  {
+    key: "category",
+    label: "Category",
+    examples: ["Software"],
+  },
+  {
+    key: "quarter",
+    label: "Quarter",
+    examples: ["Q1", "Q2", "Q3", "Q4"],
+  },
 ];
 
 function formatNumber(value: number | string | undefined) {
@@ -94,45 +106,12 @@ function getSales(payload: unknown): Sale[] {
   throw new Error("The sales API returned an unexpected response.");
 }
 
-function getQuarterRevenue(payload: unknown): QuarterRevenue[] {
-  if (!Array.isArray(payload)) {
-    throw new Error(
-      "The quarter summary API returned an unexpected response."
-    );
-  }
-
-  return ["Q1", "Q2", "Q3", "Q4"].map((quarter) => {
-    const item = payload.find(
-      (entry) =>
-        entry &&
-        typeof entry === "object" &&
-        "quarter" in entry &&
-        String(entry.quarter).toUpperCase() === quarter
-    ) as
-      | {
-          quarter?: string;
-          total_revenue?: number | string;
-        }
-      | undefined;
-
-    return {
-      quarter,
-      revenue: Number(item?.total_revenue ?? 0),
-    };
-  });
-}
-
 export default function Home() {
   const [question, setQuestion] = useState("");
   const [submittedQuestion, setSubmittedQuestion] = useState("");
+  const [questionAnswer, setQuestionAnswer] = useState("");
   const [summary, setSummary] = useState<Summary>(initialSummary);
   const [sales, setSales] = useState<Sale[]>([]);
-  const [quarterRevenue, setQuarterRevenue] = useState<QuarterRevenue[]>([
-    { quarter: "Q1", revenue: 0 },
-    { quarter: "Q2", revenue: 0 },
-    { quarter: "Q3", revenue: 0 },
-    { quarter: "Q4", revenue: 0 },
-  ]);
 
   const [filters, setFilters] = useState<Filters>({
     region: "",
@@ -144,6 +123,10 @@ export default function Home() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const [questionSaving, setQuestionSaving] = useState(false);
+  const [questionMessage, setQuestionMessage] = useState("");
+  const [questionError, setQuestionError] = useState("");
 
   async function loadSummary(
     queryString = "",
@@ -185,28 +168,9 @@ export default function Home() {
     setSales(getSales(data));
   }
 
-  async function loadQuarterRevenue(
-    queryString = "",
-    signal?: AbortSignal
-  ) {
-    const response = await fetch(
-      `/backend/summary/quarter${queryString}`,
-      { signal }
-    );
-
-    if (!response.ok) {
-      throw new Error(
-        `Quarter summary request failed (${response.status}).`
-      );
-    }
-
-    const data: unknown = await response.json();
-
-    setQuarterRevenue(getQuarterRevenue(data));
-  }
-
   useEffect(() => {
     const controller = new AbortController();
+
     const params = new URLSearchParams();
 
     Object.entries(filters).forEach(([key, value]) => {
@@ -226,8 +190,10 @@ export default function Home() {
       try {
         await Promise.all([
           loadSummary(query, controller.signal),
-          loadSales(query, controller.signal),
-          loadQuarterRevenue(query, controller.signal),
+          loadSales(
+            `${query ? `${query}&` : "?"}limit=1000`,
+            controller.signal
+          ),
         ]);
       } catch (loadError) {
         if (controller.signal.aborted) {
@@ -251,16 +217,127 @@ export default function Home() {
     return () => controller.abort();
   }, [filters]);
 
-  function handleSubmit(
+  async function handleSubmit(
     event: FormEvent<HTMLFormElement>
   ) {
     event.preventDefault();
 
     const trimmedQuestion = question.trim();
 
-    if (trimmedQuestion) {
-      setSubmittedQuestion(trimmedQuestion);
+    if (!trimmedQuestion || questionSaving) {
+      return;
+    }
+
+    setQuestionSaving(true);
+    setQuestionMessage("");
+    setQuestionError("");
+    setQuestionAnswer("");
+    setSubmittedQuestion("");
+
+    try {
+      // -------------------------------------------------
+      // STEP 1: SAVE QUESTION
+      // -------------------------------------------------
+
+      const saveResponse = await fetch(
+        "/backend/questions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            question: trimmedQuestion,
+          }),
+        }
+      );
+
+      if (!saveResponse.ok) {
+        let errorMessage =
+          `Question save failed (${saveResponse.status}).`;
+
+        try {
+          const errorData =
+            await saveResponse.json();
+
+          if (
+            typeof errorData?.detail === "string"
+          ) {
+            errorMessage = errorData.detail;
+          }
+        } catch {
+          // Keep default error message.
+        }
+
+        throw new Error(errorMessage);
+      }
+
+      const savedQuestion: {
+        id: number;
+        question: string;
+      } = await saveResponse.json();
+
+      setSubmittedQuestion(
+        savedQuestion.question
+      );
+
+      setQuestionMessage(
+        "Question saved successfully."
+      );
+
+      // -------------------------------------------------
+      // STEP 2: GET ANSWER FROM METRICMIND BACKEND
+      // -------------------------------------------------
+
+      const answerResponse = await fetch(
+        "/backend/questions/answer",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            question: trimmedQuestion,
+          }),
+        }
+      );
+
+      if (!answerResponse.ok) {
+        let errorMessage =
+          `Answer request failed (${answerResponse.status}).`;
+
+        try {
+          const errorData =
+            await answerResponse.json();
+
+          if (
+            typeof errorData?.detail === "string"
+          ) {
+            errorMessage = errorData.detail;
+          }
+        } catch {
+          // Keep default error message.
+        }
+
+        throw new Error(errorMessage);
+      }
+
+      const answerData: QuestionAnswer =
+        await answerResponse.json();
+
+      setQuestionAnswer(answerData.answer);
+
+      // Clear input only after both save + answer succeed.
       setQuestion("");
+
+    } catch (submitError) {
+      setQuestionError(
+        submitError instanceof Error
+          ? submitError.message
+          : "Unable to process the question."
+      );
+    } finally {
+      setQuestionSaving(false);
     }
   }
 
@@ -274,8 +351,27 @@ export default function Home() {
     }));
   }
 
+  const quarterRevenue = [
+    "Q1",
+    "Q2",
+    "Q3",
+    "Q4",
+  ].map((quarter) => ({
+    quarter,
+    revenue: sales.reduce(
+      (total, sale) => {
+        return sale.quarter?.toUpperCase() === quarter
+          ? total + Number(sale.revenue ?? 0)
+          : total;
+      },
+      0
+    ),
+  }));
+
   const maxQuarterRevenue = Math.max(
-    ...quarterRevenue.map(({ revenue }) => revenue),
+    ...quarterRevenue.map(
+      ({ revenue }) => revenue
+    ),
     0
   );
 
@@ -462,9 +558,10 @@ export default function Home() {
             className="error-banner"
             role="alert"
           >
-            Could not load dashboard data:{" "}
-            {error} Confirm the backend is running
-            at 127.0.0.1:8000.
+            Could not load dashboard data:
+            {" "}
+            {error} Confirm the backend is
+            running at 127.0.0.1:8000.
           </p>
         )}
 
@@ -517,7 +614,6 @@ export default function Home() {
                       index + 1
                     }`}
                   />
-
                   {label}
                 </div>
 
@@ -597,7 +693,8 @@ export default function Home() {
                       </td>
 
                       <td>
-                        {sale.product_name ?? "-"}
+                        {sale.product_name ??
+                          "-"}
                       </td>
 
                       <td>
@@ -655,18 +752,20 @@ export default function Home() {
                   Sales performance
                 </p>
 
-                <h2>Revenue by quarter</h2>
+                <h2>
+                  Revenue by quarter
+                </h2>
               </div>
 
               <span className="record-count">
-                Based on all matching records
+                Based on loaded records
               </span>
             </div>
 
             <div
               className="quarter-chart"
               role="img"
-              aria-label="Revenue by quarter from backend summary data"
+              aria-label="Revenue by quarter from currently loaded sales records"
             >
               {quarterRevenue.map(
                 ({
@@ -678,11 +777,11 @@ export default function Home() {
                     key={quarter}
                   >
                     <strong>
-                      {loading
-                        ? "-"
-                        : formatMoney(
+                      {sales.length
+                        ? formatMoney(
                             revenue
-                          )}
+                          )
+                        : "-"}
                     </strong>
 
                     <div className="quarter-track">
@@ -720,10 +819,7 @@ export default function Home() {
             )}
 
             {!loading &&
-              quarterRevenue.every(
-                ({ revenue }) =>
-                  revenue === 0
-              ) && (
+              sales.length === 0 && (
                 <p className="chart-status">
                   Quarter values will appear
                   when sales records are
@@ -739,11 +835,13 @@ export default function Home() {
                   Ask MetricMind
                 </p>
 
-                <h2>Business question</h2>
+                <h2>
+                  Business question
+                </h2>
               </div>
 
               <span className="coming-soon">
-                AI later
+                AI
               </span>
             </div>
 
@@ -765,16 +863,32 @@ export default function Home() {
                 }
                 placeholder="e.g. Which quarter had the highest revenue?"
                 rows={3}
+                disabled={questionSaving}
               />
 
               <div className="form-footer">
                 <span className="helper-text">
-                  AI integration will be connected
-                  later.
+                  {questionSaving
+                    ? "Analyzing question..."
+                    : questionError
+                      ? questionError
+                      : questionMessage ||
+                        "Ask a business question to get an answer."}
                 </span>
 
-                <button type="submit">
-                  Save question{" "}
+                <button
+                  type="submit"
+                  disabled={
+                    questionSaving ||
+                    !question.trim()
+                  }
+                >
+                  {questionSaving
+                    ? "Analyzing..."
+                    : "Ask MetricMind"}
+
+                  {" "}
+
                   <span aria-hidden="true">
                     -&gt;
                   </span>
@@ -793,14 +907,13 @@ export default function Home() {
                   </p>
 
                   <p className="response-message">
-                    AI integration will be
-                    connected later.
+                    {questionAnswer ||
+                      "Preparing answer..."}
                   </p>
                 </>
               ) : (
                 <p className="helper-text">
-                  Your question will be ready
-                  for future analysis.
+                  Your answer will appear here.
                 </p>
               )}
             </div>

@@ -60,7 +60,9 @@ def test_sales_country_filter():
 
 
 def test_sales_product_filter():
-    response = client.get("/sales?product_name=Analytics%20Suite")
+    response = client.get(
+        "/sales?product_name=Analytics%20Suite"
+    )
 
     assert response.status_code == 200
 
@@ -186,6 +188,7 @@ def test_sales_pagination():
     response = client.get("/sales?limit=5&offset=0")
 
     assert response.status_code == 200
+
     data = response.json()
 
     assert len(data) == 5
@@ -195,6 +198,75 @@ def test_sales_pagination_offset():
     response = client.get("/sales?limit=5&offset=5")
 
     assert response.status_code == 200
+
     data = response.json()
 
     assert len(data) == 5
+
+
+# ============================================================
+# QUESTION API TESTS
+# ============================================================
+
+def test_create_question():
+    response = client.post(
+        "/questions",
+        json={
+            "question": "Which quarter had the highest revenue?"
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert "id" in data
+    assert data["question"] == (
+        "Which quarter had the highest revenue?"
+    )
+
+
+def test_get_questions():
+    response = client.get("/questions")
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert isinstance(data, list)
+
+
+def test_answer_question_highest_revenue():
+    response = client.post(
+        "/questions/answer",
+        json={
+            "question": "Which quarter had the highest revenue?"
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["question"] == (
+        "Which quarter had the highest revenue?"
+    )
+    assert "highest revenue" in data["answer"].lower()
+    assert "Q" in data["answer"]
+
+
+def test_answer_question_total_revenue():
+    response = client.post(
+        "/questions/answer",
+        json={
+            "question": "What is the total revenue?"
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["question"] == "What is the total revenue?"
+    assert "total revenue" in data["answer"].lower()
+    assert "$" in data["answer"]

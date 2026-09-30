@@ -8,19 +8,26 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 
-# =========================================================
+# ============================================================
 # ENVIRONMENT
-# =========================================================
+# ============================================================
 
-load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ENV_FILE = os.path.join(BASE_DIR, ".env")
+
+load_dotenv(ENV_FILE)
 
 
-# =========================================================
+# ============================================================
 # FASTAPI APP
-# =========================================================
+# ============================================================
 
 app = FastAPI(title="MetricMind Backend")
 
+
+# ============================================================
+# CORS
+# ============================================================
 
 app.add_middleware(
     CORSMiddleware,
@@ -34,9 +41,9 @@ app.add_middleware(
 )
 
 
-# =========================================================
+# ============================================================
 # RESPONSE MODELS
-# =========================================================
+# ============================================================
 
 class SalesResponse(BaseModel):
     order_id: str
@@ -87,9 +94,9 @@ class QuestionAnswerResponse(BaseModel):
     answer: str
 
 
-# =========================================================
+# ============================================================
 # DATABASE CONNECTION
-# =========================================================
+# ============================================================
 
 def get_db_connection():
     try:
@@ -107,9 +114,9 @@ def get_db_connection():
         )
 
 
-# =========================================================
-# ROOT
-# =========================================================
+# ============================================================
+# ROOT API
+# ============================================================
 
 @app.get("/")
 def root():
@@ -119,20 +126,18 @@ def root():
     }
 
 
-# =========================================================
-# HEALTH
-# =========================================================
+# ============================================================
+# HEALTH API
+# ============================================================
 
 @app.get("/health")
 def health():
-    return {
-        "status": "healthy"
-    }
+    return {"status": "healthy"}
 
 
-# =========================================================
-# DATABASE HEALTH
-# =========================================================
+# ============================================================
+# DATABASE HEALTH API
+# ============================================================
 
 @app.get("/db-health")
 def db_health():
@@ -155,14 +160,11 @@ def db_health():
         }
 
 
-# =========================================================
+# ============================================================
 # SALES API
-# =========================================================
+# ============================================================
 
-@app.get(
-    "/sales",
-    response_model=list[SalesResponse]
-)
+@app.get("/sales", response_model=list[SalesResponse])
 def get_sales(
     region: str | None = Query(default=None),
     country: str | None = Query(default=None),
@@ -172,7 +174,6 @@ def get_sales(
     limit: int = Query(default=20, ge=1, le=1000),
     offset: int = Query(default=0, ge=0),
 ):
-
     query = """
         SELECT
             order_id,
@@ -228,9 +229,7 @@ def get_sales(
     try:
         with get_db_connection() as conn:
             with conn.cursor() as cur:
-
                 cur.execute(query, params)
-
                 rows = cur.fetchall()
 
         return [
@@ -262,14 +261,11 @@ def get_sales(
         )
 
 
-# =========================================================
+# ============================================================
 # SUMMARY API
-# =========================================================
+# ============================================================
 
-@app.get(
-    "/summary",
-    response_model=SummaryResponse
-)
+@app.get("/summary", response_model=SummaryResponse)
 def get_summary(
     region: str | None = Query(default=None),
     country: str | None = Query(default=None),
@@ -277,7 +273,6 @@ def get_summary(
     category: str | None = Query(default=None),
     quarter: str | None = Query(default=None),
 ):
-
     query = """
         SELECT
             COUNT(*) AS total_orders,
@@ -313,9 +308,7 @@ def get_summary(
     try:
         with get_db_connection() as conn:
             with conn.cursor() as cur:
-
                 cur.execute(query, params)
-
                 row = cur.fetchone()
 
         total_orders = int(row[0] or 0)
@@ -334,10 +327,7 @@ def get_summary(
             total_revenue=total_revenue,
             total_cost=total_cost,
             total_margin=total_margin,
-            margin_percentage=round(
-                margin_percentage,
-                2
-            ),
+            margin_percentage=round(margin_percentage, 2),
         )
 
     except Exception as exc:
@@ -347,20 +337,19 @@ def get_summary(
         )
 
 
-# =========================================================
+# ============================================================
 # CATEGORY SUMMARY API
-# =========================================================
+# ============================================================
 
 @app.get(
     "/summary/category",
-    response_model=list[CategorySummaryResponse]
+    response_model=list[CategorySummaryResponse],
 )
 def get_category_summary(
     region: str | None = Query(default=None),
     country: str | None = Query(default=None),
     quarter: str | None = Query(default=None),
 ):
-
     query = """
         SELECT
             category,
@@ -394,9 +383,7 @@ def get_category_summary(
     try:
         with get_db_connection() as conn:
             with conn.cursor() as cur:
-
                 cur.execute(query, params)
-
                 rows = cur.fetchall()
 
         return [
@@ -417,16 +404,12 @@ def get_category_summary(
         )
 
 
-# =========================================================
-# QUESTIONS API - SAVE QUESTION
-# =========================================================
+# ============================================================
+# CREATE QUESTION API
+# ============================================================
 
-@app.post(
-    "/questions",
-    response_model=QuestionResponse
-)
+@app.post("/questions", response_model=QuestionResponse)
 def create_question(payload: QuestionCreate):
-
     question = payload.question.strip()
 
     if not question:
@@ -459,7 +442,6 @@ def create_question(payload: QuestionCreate):
                 )
 
                 row = cur.fetchone()
-
                 conn.commit()
 
         return QuestionResponse(
@@ -474,16 +456,12 @@ def create_question(payload: QuestionCreate):
         )
 
 
-# =========================================================
-# QUESTIONS API - GET SAVED QUESTIONS
-# =========================================================
+# ============================================================
+# GET SAVED QUESTIONS API
+# ============================================================
 
-@app.get(
-    "/questions",
-    response_model=list[QuestionResponse]
-)
+@app.get("/questions", response_model=list[QuestionResponse])
 def get_questions():
-
     try:
         with get_db_connection() as conn:
             with conn.cursor() as cur:
@@ -509,7 +487,6 @@ def get_questions():
                 )
 
                 rows = cur.fetchall()
-
                 conn.commit()
 
         return [
@@ -527,13 +504,13 @@ def get_questions():
         )
 
 
-# =========================================================
-# ASK METRICMIND - QUESTION ANSWER API
-# =========================================================
+# ============================================================
+# ASK METRICMIND - ANSWER QUESTION API
+# ============================================================
 
 @app.post(
     "/questions/answer",
-    response_model=QuestionAnswerResponse
+    response_model=QuestionAnswerResponse,
 )
 def answer_question(payload: QuestionCreate):
 
@@ -547,9 +524,9 @@ def answer_question(payload: QuestionCreate):
 
     question_lower = question.lower()
 
-    # -----------------------------------------------------
-    # QUARTER REVENUE QUESTIONS
-    # -----------------------------------------------------
+    # --------------------------------------------------------
+    # HIGHEST QUARTERLY REVENUE
+    # --------------------------------------------------------
 
     if (
         "quarter" in question_lower
@@ -560,7 +537,6 @@ def answer_question(payload: QuestionCreate):
             or "most" in question_lower
         )
     ):
-
         query = """
             SELECT
                 quarter,
@@ -574,14 +550,13 @@ def answer_question(payload: QuestionCreate):
         try:
             with get_db_connection() as conn:
                 with conn.cursor() as cur:
-
                     cur.execute(query)
-
                     row = cur.fetchone()
 
             if not row:
-                answer = "No sales data is available to answer this question."
-
+                answer = (
+                    "No sales data is available to answer this question."
+                )
             else:
                 quarter = row[0]
                 revenue = float(row[1])
@@ -602,9 +577,9 @@ def answer_question(payload: QuestionCreate):
                 detail=f"Question analysis failed: {exc}",
             )
 
-    # -----------------------------------------------------
-    # QUARTER REVENUE - LOWEST
-    # -----------------------------------------------------
+    # --------------------------------------------------------
+    # LOWEST QUARTERLY REVENUE
+    # --------------------------------------------------------
 
     if (
         "quarter" in question_lower
@@ -615,7 +590,6 @@ def answer_question(payload: QuestionCreate):
             or "least" in question_lower
         )
     ):
-
         query = """
             SELECT
                 quarter,
@@ -629,14 +603,13 @@ def answer_question(payload: QuestionCreate):
         try:
             with get_db_connection() as conn:
                 with conn.cursor() as cur:
-
                     cur.execute(query)
-
                     row = cur.fetchone()
 
             if not row:
-                answer = "No sales data is available to answer this question."
-
+                answer = (
+                    "No sales data is available to answer this question."
+                )
             else:
                 quarter = row[0]
                 revenue = float(row[1])
@@ -657,9 +630,9 @@ def answer_question(payload: QuestionCreate):
                 detail=f"Question analysis failed: {exc}",
             )
 
-    # -----------------------------------------------------
-    # QUARTER MARGIN QUESTIONS - HIGHEST
-    # -----------------------------------------------------
+    # --------------------------------------------------------
+    # HIGHEST QUARTERLY MARGIN
+    # --------------------------------------------------------
 
     if (
         "quarter" in question_lower
@@ -670,7 +643,6 @@ def answer_question(payload: QuestionCreate):
             or "most" in question_lower
         )
     ):
-
         query = """
             SELECT
                 quarter,
@@ -684,14 +656,13 @@ def answer_question(payload: QuestionCreate):
         try:
             with get_db_connection() as conn:
                 with conn.cursor() as cur:
-
                     cur.execute(query)
-
                     row = cur.fetchone()
 
             if not row:
-                answer = "No sales data is available to answer this question."
-
+                answer = (
+                    "No sales data is available to answer this question."
+                )
             else:
                 quarter = row[0]
                 margin = float(row[1])
@@ -712,9 +683,9 @@ def answer_question(payload: QuestionCreate):
                 detail=f"Question analysis failed: {exc}",
             )
 
-    # -----------------------------------------------------
-    # QUARTER MARGIN QUESTIONS - LOWEST
-    # -----------------------------------------------------
+    # --------------------------------------------------------
+    # LOWEST QUARTERLY MARGIN
+    # --------------------------------------------------------
 
     if (
         "quarter" in question_lower
@@ -725,7 +696,6 @@ def answer_question(payload: QuestionCreate):
             or "least" in question_lower
         )
     ):
-
         query = """
             SELECT
                 quarter,
@@ -739,14 +709,13 @@ def answer_question(payload: QuestionCreate):
         try:
             with get_db_connection() as conn:
                 with conn.cursor() as cur:
-
                     cur.execute(query)
-
                     row = cur.fetchone()
 
             if not row:
-                answer = "No sales data is available to answer this question."
-
+                answer = (
+                    "No sales data is available to answer this question."
+                )
             else:
                 quarter = row[0]
                 margin = float(row[1])
@@ -767,15 +736,14 @@ def answer_question(payload: QuestionCreate):
                 detail=f"Question analysis failed: {exc}",
             )
 
-    # -----------------------------------------------------
+    # --------------------------------------------------------
     # TOTAL REVENUE
-    # -----------------------------------------------------
+    # --------------------------------------------------------
 
     if (
         "revenue" in question_lower
         and "total" in question_lower
     ):
-
         query = """
             SELECT
                 COALESCE(SUM(revenue), 0)
@@ -785,16 +753,12 @@ def answer_question(payload: QuestionCreate):
         try:
             with get_db_connection() as conn:
                 with conn.cursor() as cur:
-
                     cur.execute(query)
-
                     row = cur.fetchone()
 
             revenue = float(row[0] or 0)
 
-            answer = (
-                f"Total revenue is ${revenue:,.2f}."
-            )
+            answer = f"Total revenue is ${revenue:,.2f}."
 
             return QuestionAnswerResponse(
                 question=question,
@@ -807,15 +771,14 @@ def answer_question(payload: QuestionCreate):
                 detail=f"Question analysis failed: {exc}",
             )
 
-    # -----------------------------------------------------
+    # --------------------------------------------------------
     # TOTAL MARGIN
-    # -----------------------------------------------------
+    # --------------------------------------------------------
 
     if (
         "margin" in question_lower
         and "total" in question_lower
     ):
-
         query = """
             SELECT
                 COALESCE(SUM(margin), 0)
@@ -825,16 +788,12 @@ def answer_question(payload: QuestionCreate):
         try:
             with get_db_connection() as conn:
                 with conn.cursor() as cur:
-
                     cur.execute(query)
-
                     row = cur.fetchone()
 
             margin = float(row[0] or 0)
 
-            answer = (
-                f"Total margin is ${margin:,.2f}."
-            )
+            answer = f"Total margin is ${margin:,.2f}."
 
             return QuestionAnswerResponse(
                 question=question,
@@ -847,9 +806,9 @@ def answer_question(payload: QuestionCreate):
                 detail=f"Question analysis failed: {exc}",
             )
 
-    # -----------------------------------------------------
+    # --------------------------------------------------------
     # TOTAL ORDERS
-    # -----------------------------------------------------
+    # --------------------------------------------------------
 
     if (
         "orders" in question_lower
@@ -859,7 +818,6 @@ def answer_question(payload: QuestionCreate):
             or "number" in question_lower
         )
     ):
-
         query = """
             SELECT COUNT(*)
             FROM fct_sales
@@ -868,9 +826,7 @@ def answer_question(payload: QuestionCreate):
         try:
             with get_db_connection() as conn:
                 with conn.cursor() as cur:
-
                     cur.execute(query)
-
                     row = cur.fetchone()
 
             total_orders = int(row[0] or 0)
@@ -890,9 +846,9 @@ def answer_question(payload: QuestionCreate):
                 detail=f"Question analysis failed: {exc}",
             )
 
-    # -----------------------------------------------------
-    # UNSUPPORTED QUESTION
-    # -----------------------------------------------------
+    # --------------------------------------------------------
+    # FALLBACK
+    # --------------------------------------------------------
 
     return QuestionAnswerResponse(
         question=question,

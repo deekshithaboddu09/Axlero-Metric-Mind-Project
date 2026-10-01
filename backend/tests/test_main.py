@@ -6,6 +6,10 @@ from backend.main import app
 client = TestClient(app)
 
 
+# ============================================================
+# EXISTING BACKEND TESTS
+# ============================================================
+
 def test_health():
     response = client.get("/health")
 
@@ -269,4 +273,103 @@ def test_answer_question_total_revenue():
 
     assert data["question"] == "What is the total revenue?"
     assert "total revenue" in data["answer"].lower()
+    assert "$" in data["answer"]
+
+
+# ============================================================
+# NEW ASK METRICMIND TESTS
+# ============================================================
+
+def test_answer_question_highest_category_revenue():
+    response = client.post(
+        "/questions/answer",
+        json={
+            "question": "Which category generated the highest revenue?"
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["question"] == (
+        "Which category generated the highest revenue?"
+    )
+    assert "highest revenue" in data["answer"].lower()
+    assert "$" in data["answer"]
+
+
+def test_answer_question_highest_category_margin():
+    response = client.post(
+        "/questions/answer",
+        json={
+            "question": "Which category generated the highest margin?"
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["question"] == (
+        "Which category generated the highest margin?"
+    )
+    assert "highest margin" in data["answer"].lower()
+    assert "$" in data["answer"]
+
+
+def test_answer_question_highest_country_revenue():
+    response = client.post(
+        "/questions/answer",
+        json={
+            "question": "Which country generated the highest revenue?"
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["question"] == (
+        "Which country generated the highest revenue?"
+    )
+    assert "highest revenue" in data["answer"].lower()
+    assert "$" in data["answer"]
+
+
+def test_answer_question_highest_region_revenue():
+    response = client.post(
+        "/questions/answer",
+        json={
+            "question": "Which region generated the highest revenue?"
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["question"] == (
+        "Which region generated the highest revenue?"
+    )
+    assert "highest revenue" in data["answer"].lower()
+    assert "$" in data["answer"]
+
+
+def test_answer_question_highest_product_revenue():
+    response = client.post(
+        "/questions/answer",
+        json={
+            "question": "Which product generated the highest revenue?"
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["question"] == (
+        "Which product generated the highest revenue?"
+    )
+    assert "highest revenue" in data["answer"].lower()
     assert "$" in data["answer"]

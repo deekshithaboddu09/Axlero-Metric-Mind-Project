@@ -737,6 +737,271 @@ def answer_question(payload: QuestionCreate):
             )
 
     # --------------------------------------------------------
+    # HIGHEST CATEGORY REVENUE
+    # --------------------------------------------------------
+
+    if (
+        "category" in question_lower
+        and "revenue" in question_lower
+        and (
+            "highest" in question_lower
+            or "maximum" in question_lower
+            or "most" in question_lower
+        )
+    ):
+        query = """
+            SELECT
+                category,
+                COALESCE(SUM(revenue), 0) AS total_revenue
+            FROM fct_sales
+            GROUP BY category
+            ORDER BY total_revenue DESC
+            LIMIT 1
+        """
+
+        try:
+            with get_db_connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(query)
+                    row = cur.fetchone()
+
+            if not row:
+                answer = (
+                    "No sales data is available to answer this question."
+                )
+            else:
+                category = row[0]
+                revenue = float(row[1])
+
+                answer = (
+                    f"{category} generated the highest revenue "
+                    f"with ${revenue:,.2f}."
+                )
+
+            return QuestionAnswerResponse(
+                question=question,
+                answer=answer,
+            )
+
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Question analysis failed: {exc}",
+            )
+
+    # --------------------------------------------------------
+    # HIGHEST CATEGORY MARGIN
+    # --------------------------------------------------------
+
+    if (
+        "category" in question_lower
+        and "margin" in question_lower
+        and (
+            "highest" in question_lower
+            or "maximum" in question_lower
+            or "most" in question_lower
+        )
+    ):
+        query = """
+            SELECT
+                category,
+                COALESCE(SUM(margin), 0) AS total_margin
+            FROM fct_sales
+            GROUP BY category
+            ORDER BY total_margin DESC
+            LIMIT 1
+        """
+
+        try:
+            with get_db_connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(query)
+                    row = cur.fetchone()
+
+            if not row:
+                answer = (
+                    "No sales data is available to answer this question."
+                )
+            else:
+                category = row[0]
+                margin = float(row[1])
+
+                answer = (
+                    f"{category} generated the highest margin "
+                    f"with ${margin:,.2f}."
+                )
+
+            return QuestionAnswerResponse(
+                question=question,
+                answer=answer,
+            )
+
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Question analysis failed: {exc}",
+            )
+
+    # --------------------------------------------------------
+    # HIGHEST COUNTRY REVENUE
+    # --------------------------------------------------------
+
+    if (
+        "country" in question_lower
+        and "revenue" in question_lower
+        and (
+            "highest" in question_lower
+            or "maximum" in question_lower
+            or "most" in question_lower
+        )
+    ):
+        query = """
+            SELECT
+                country,
+                COALESCE(SUM(revenue), 0) AS total_revenue
+            FROM fct_sales
+            GROUP BY country
+            ORDER BY total_revenue DESC
+            LIMIT 1
+        """
+
+        try:
+            with get_db_connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(query)
+                    row = cur.fetchone()
+
+            if not row:
+                answer = (
+                    "No sales data is available to answer this question."
+                )
+            else:
+                country = row[0]
+                revenue = float(row[1])
+
+                answer = (
+                    f"{country} generated the highest revenue "
+                    f"with ${revenue:,.2f}."
+                )
+
+            return QuestionAnswerResponse(
+                question=question,
+                answer=answer,
+            )
+
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Question analysis failed: {exc}",
+            )
+
+    # --------------------------------------------------------
+    # HIGHEST REGION REVENUE
+    # --------------------------------------------------------
+
+    if (
+        "region" in question_lower
+        and "revenue" in question_lower
+        and (
+            "highest" in question_lower
+            or "maximum" in question_lower
+            or "most" in question_lower
+        )
+    ):
+        query = """
+            SELECT
+                region,
+                COALESCE(SUM(revenue), 0) AS total_revenue
+            FROM fct_sales
+            GROUP BY region
+            ORDER BY total_revenue DESC
+            LIMIT 1
+        """
+
+        try:
+            with get_db_connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(query)
+                    row = cur.fetchone()
+
+            if not row:
+                answer = (
+                    "No sales data is available to answer this question."
+                )
+            else:
+                region = row[0]
+                revenue = float(row[1])
+
+                answer = (
+                    f"{region} generated the highest revenue "
+                    f"with ${revenue:,.2f}."
+                )
+
+            return QuestionAnswerResponse(
+                question=question,
+                answer=answer,
+            )
+
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Question analysis failed: {exc}",
+            )
+
+    # --------------------------------------------------------
+    # HIGHEST PRODUCT REVENUE
+    # --------------------------------------------------------
+
+    if (
+        "product" in question_lower
+        and "revenue" in question_lower
+        and (
+            "highest" in question_lower
+            or "maximum" in question_lower
+            or "most" in question_lower
+        )
+    ):
+        query = """
+            SELECT
+                product_name,
+                COALESCE(SUM(revenue), 0) AS total_revenue
+            FROM fct_sales
+            GROUP BY product_name
+            ORDER BY total_revenue DESC
+            LIMIT 1
+        """
+
+        try:
+            with get_db_connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(query)
+                    row = cur.fetchone()
+
+            if not row:
+                answer = (
+                    "No sales data is available to answer this question."
+                )
+            else:
+                product = row[0]
+                revenue = float(row[1])
+
+                answer = (
+                    f"{product} generated the highest revenue "
+                    f"with ${revenue:,.2f}."
+                )
+
+            return QuestionAnswerResponse(
+                question=question,
+                answer=answer,
+            )
+
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Question analysis failed: {exc}",
+            )
+
+    # --------------------------------------------------------
     # TOTAL REVENUE
     # --------------------------------------------------------
 
@@ -854,7 +1119,8 @@ def answer_question(payload: QuestionCreate):
         question=question,
         answer=(
             "I can currently answer questions about total revenue, "
-            "total margin, total orders, and highest or lowest "
-            "quarterly revenue or margin."
+            "total margin, total orders, highest or lowest quarterly "
+            "revenue or margin, and highest revenue or margin by "
+            "category, country, region, or product."
         ),
     )

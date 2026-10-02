@@ -29,6 +29,7 @@ type Filters = {
   category: string;
   quarter: string;
 };
+type ChatState = "idle" | "queued" | "loading" | "error";
 
 const initialSummary: Summary = {
   total_orders: 0,
@@ -72,9 +73,21 @@ function getSales(payload: unknown): Sale[] {
   throw new Error("The sales API returned an unexpected response.");
 }
 
+function buildFilterQuery(filters: Filters) {
+  const params = new URLSearchParams();
+
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value) params.set(key, value);
+  });
+
+  return params.size ? `?${params.toString()}` : "";
+}
+
 export default function Home() {
   const [question, setQuestion] = useState("");
   const [submittedQuestion, setSubmittedQuestion] = useState("");
+  const [chatState, setChatState] = useState<ChatState>("idle");
+  const [chatError, setChatError] = useState("");
   const [summary, setSummary] = useState<Summary>(initialSummary);
   const [sales, setSales] = useState<Sale[]>([]);
   const [filters, setFilters] = useState<Filters>({
@@ -89,6 +102,7 @@ export default function Home() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
   const initialLoading = loading && lastUpdated === null;
+  const filterQuery = buildFilterQuery(filters);
 
   async function loadSummary(queryString = "", signal?: AbortSignal) {
     const response = await fetch(`/backend/summary${queryString}`, { signal });
@@ -113,22 +127,14 @@ export default function Home() {
       timedOut = true;
       controller.abort();
     }, 12000);
-    const params = new URLSearchParams();
-
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value) params.set(key, value);
-    });
-
-    const query = params.size ? `?${params.toString()}` : "";
-
     async function loadDashboard() {
       setLoading(true);
       setError("");
 
       try {
         await Promise.all([
-          loadSummary(query, controller.signal),
-          loadSales(query, controller.signal),
+          loadSummary(filterQuery, controller.signal),
+          loadSales(filterQuery, controller.signal),
         ]);
         setLastUpdated(new Date());
       } catch (loadError) {
@@ -146,7 +152,7 @@ export default function Home() {
       window.clearTimeout(timeoutId);
       controller.abort();
     };
-  }, [filters, reloadKey]);
+  }, [filterQuery, reloadKey]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -154,6 +160,8 @@ export default function Home() {
 
     if (trimmedQuestion) {
       setSubmittedQuestion(trimmedQuestion);
+      setChatError("");
+      setChatState("queued");
       setQuestion("");
     }
   }
@@ -236,6 +244,23 @@ export default function Home() {
             ))}
           </div>
         </section>
+
+        <details className="api-inspector">
+          <summary>View API calls</summary>
+          <div className="api-inspector-content">
+            <p>Dashboard requests use the selected filters through the frontend proxy. No credentials or secrets are displayed.</p>
+            <div className="api-call-list">
+              <div className="api-call">
+                <span className="api-method">GET</span>
+                <code>/backend/summary{filterQuery}</code>
+              </div>
+              <div className="api-call">
+                <span className="api-method">GET</span>
+                <code>/backend/sales{filterQuery}</code>
+              </div>
+            </div>
+          </div>
+        </details>
 
         {error && (
           <div className="error-banner" role="alert">
@@ -332,20 +357,40 @@ export default function Home() {
             </div>
             <form className="question-form" onSubmit={handleSubmit}>
               <label htmlFor="business-question">What would you like to know?</label>
-              <textarea id="business-question" value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="e.g. Which quarter had the highest revenue?" rows={3} />
+              <textarea id="business-question" value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="e.g. Which quarter had the highest revenue?" rows={4} />
               <div className="prompt-list" aria-label="Starter questions">
                 {["How are sales performing?", "Compare revenue by quarter"].map((prompt) => (
                   <button className="prompt-button" key={prompt} type="button" onClick={() => setQuestion(prompt)}>{prompt}</button>
                 ))}
               </div>
               <div className="form-footer">
-                <span className="helper-text">Questions stay in this page; AI is not connected.</span>
-                <button type="submit">Queue question <span aria-hidden="true">-&gt;</span></button>
+                <span className="helper-text">Saved locally only. No AI request is sent yet.</span>
+                <button className="send-question" type="submit" disabled={!question.trim() || chatState === "loading"}>Send question <span aria-hidden="true">-&gt;</span></button>
               </div>
             </form>
-            <div className="chat-response" aria-live="polite">
-              {submittedQuestion ? <><p className="question-echo">“{submittedQuestion}”</p><p className="response-message">Saved locally. MetricMind AI will be connected in a later phase.</p></> : <p className="helper-text">Add a question to prepare it for a future AI connection.</p>}
-            </div>
+            <section className={`chat-response chat-response-${chatState}`} aria-label="Response area" aria-live="polite">
+              <p className="response-label">Response</p>
+              {chatState === "loading" ? (
+                <div className="chat-loading" role="status"><span className="chat-spinner" aria-hidden="true" /> Preparing your answer...</div>
+              ) : chatState === "error" ? (
+                <div className="chat-error" role="alert">
+                  <strong>We couldn’t get a response.</strong>
+                  <p>{chatError || "Check the connection and try again."} Your question is still available above.</p>
+                </div>
+              ) : submittedQuestion ? (
+                <>
+                  <p className="question-echo">“{submittedQuestion}”</p>
+                  <dl className="structured-answer">
+                    <div><dt>Answer</dt><dd>{chatState === "queued" ? "Waiting for the approved AI connection." : "A structured answer will appear here."}</dd></div>
+                    <div><dt>Supporting data</dt><dd>Metrics and evidence will appear here when connected.</dd></div>
+                    <div><dt>Applied filters</dt><dd>{Object.entries(filters).filter(([, value]) => value).map(([key, value]) => `${key}: ${value}`).join(" · ") || "None"}</dd></div>
+                  </dl>
+                  <p className="response-message">Saved locally only; no AI request was sent.</p>
+                </>
+              ) : (
+                <p className="helper-text">Your structured answer, supporting data, and applied filters will appear here.</p>
+              )}
+            </section>
           </section>
         </div>
       </main>

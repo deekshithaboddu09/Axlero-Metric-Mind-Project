@@ -87,6 +87,15 @@ button:hover { background: #0e5143; transform: translateY(-1px); }
 .filter-control { display: flex; min-width: 0; flex-direction: column; gap: 7px; margin: 0; color: var(--ink-muted); font-size: 11px; }
 .filter-control select { width: 100%; height: 42px; border: 1px solid var(--line); border-radius: 0; padding: 0 11px; background: var(--paper); color: var(--foreground); font: inherit; font-size: 12px; }
 .filter-control select:focus { outline: 2px solid rgba(22, 107, 89, .3); outline-offset: 1px; }
+.api-inspector { margin: -8px 0 22px; border-bottom: 1px solid var(--line); color: var(--ink-muted); }
+.api-inspector summary { width: fit-content; padding: 8px 0; color: var(--accent); cursor: pointer; font-size: 11px; font-weight: 700; }
+.api-inspector summary:hover { color: #0e5143; }
+.api-inspector-content { padding: 0 0 14px; }
+.api-inspector-content > p { margin: 0 0 10px; font-size: 11px; line-height: 1.5; }
+.api-call-list { display: grid; gap: 7px; }
+.api-call { display: flex; min-width: 0; align-items: flex-start; gap: 10px; border: 1px solid var(--line); padding: 9px 10px; background: rgba(255, 253, 248, .7); }
+.api-method { flex: 0 0 auto; color: var(--accent); font-family: var(--font-geist-mono), monospace; font-size: 10px; font-weight: 700; }
+.api-call code { min-width: 0; color: var(--foreground); font-size: 11px; line-height: 1.5; overflow-wrap: anywhere; white-space: normal; }
 .clear-button { padding: 8px 0; background: transparent; color: var(--accent); font-size: 11px; }
 .clear-button:hover { background: transparent; color: #0e5143; text-decoration: underline; transform: none; }
 .clear-button:disabled { color: #a7ada8; cursor: default; text-decoration: none; }
@@ -148,13 +157,26 @@ tbody tr:hover { background: #f3f6f0; }
 .chart-status { margin: 13px 0 0; color: var(--ink-muted); font-size: 11px; }
 .chat-panel { display: flex; flex-direction: column; }
 .chat-panel .question-form { height: auto; flex: 1; }
-.chat-panel textarea { min-height: 90px; }
+.chat-panel textarea { min-height: 130px; }
 .chat-panel .form-footer { align-items: flex-start; flex-direction: column; }
 .chat-panel button { width: 100%; }
+.chat-panel .send-question { min-height: 44px; font-size: 13px; }
+.chat-panel .send-question:disabled { background: #8b9d95; cursor: not-allowed; transform: none; }
 .prompt-list { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 11px; }
 .prompt-list .prompt-button { width: auto; border: 1px solid var(--line); padding: 7px 9px; background: transparent; color: var(--ink-muted); font-size: 10px; font-weight: 500; }
 .prompt-list .prompt-button:hover { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); transform: none; }
-.chat-response { min-height: 65px; margin-top: 16px; border-top: 1px solid var(--line); padding-top: 13px; }
+.chat-response { min-height: 156px; margin-top: 20px; border-top: 1px solid var(--line); padding-top: 15px; }
+.response-label { margin-bottom: 12px; color: var(--ink-muted); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.structured-answer { display: grid; gap: 10px; margin: 14px 0 0; }
+.structured-answer div { display: grid; grid-template-columns: 100px minmax(0, 1fr); gap: 12px; border-top: 1px solid #e7e9e4; padding-top: 9px; }
+.structured-answer dt { color: var(--ink-muted); font-size: 11px; font-weight: 600; }
+.structured-answer dd { min-width: 0; margin: 0; color: var(--foreground); font-size: 11px; line-height: 1.5; overflow-wrap: anywhere; }
+.chat-loading { display: flex; align-items: center; gap: 10px; min-height: 62px; color: var(--ink-muted); font-size: 12px; }
+.chat-spinner { width: 15px; height: 15px; border: 2px solid #cbd7d0; border-top-color: var(--accent); border-radius: 50%; animation: chat-spin .8s linear infinite; }
+@keyframes chat-spin { to { transform: rotate(360deg); } }
+.chat-error { border-left: 3px solid #c4523f; padding: 10px 12px; background: #f8e8e3; color: #72392d; }
+.chat-error strong { font-size: 12px; }
+.chat-error p { margin: 5px 0 0; font-size: 11px; line-height: 1.5; }
 .chat-response p { margin-bottom: 0; }
 .chat-response .question-echo { font-size: 12px; }
 .chat-response .response-message { margin-top: 8px; font-size: 11px; }

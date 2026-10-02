@@ -513,7 +513,6 @@ def get_questions():
     response_model=QuestionAnswerResponse,
 )
 def answer_question(payload: QuestionCreate):
-
     question = payload.question.strip()
 
     if not question:
@@ -522,8 +521,37 @@ def answer_question(payload: QuestionCreate):
             detail="Question cannot be empty",
         )
 
+    
     question_lower = question.lower()
+        # Save the question automatically in question history
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS saved_questions (
+                        id SERIAL PRIMARY KEY,
+                        question TEXT NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                    """
+                )
 
+                cur.execute(
+                    """
+                    INSERT INTO saved_questions (question)
+                    VALUES (%s)
+                    """,
+                    (question,),
+                )
+
+                conn.commit()
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Question history save failed: {exc}",
+        )
     # --------------------------------------------------------
     # HIGHEST QUARTERLY REVENUE
     # --------------------------------------------------------
@@ -554,22 +582,13 @@ def answer_question(payload: QuestionCreate):
                     row = cur.fetchone()
 
             if not row:
-                answer = (
-                    "No sales data is available to answer this question."
-                )
+                answer = "No sales data is available to answer this question."
             else:
                 quarter = row[0]
                 revenue = float(row[1])
+                answer = f"{quarter} had the highest revenue with ${revenue:,.2f}."
 
-                answer = (
-                    f"{quarter} had the highest revenue "
-                    f"with ${revenue:,.2f}."
-                )
-
-            return QuestionAnswerResponse(
-                question=question,
-                answer=answer,
-            )
+            return QuestionAnswerResponse(question=question, answer=answer)
 
         except Exception as exc:
             raise HTTPException(
@@ -607,22 +626,13 @@ def answer_question(payload: QuestionCreate):
                     row = cur.fetchone()
 
             if not row:
-                answer = (
-                    "No sales data is available to answer this question."
-                )
+                answer = "No sales data is available to answer this question."
             else:
                 quarter = row[0]
                 revenue = float(row[1])
+                answer = f"{quarter} had the lowest revenue with ${revenue:,.2f}."
 
-                answer = (
-                    f"{quarter} had the lowest revenue "
-                    f"with ${revenue:,.2f}."
-                )
-
-            return QuestionAnswerResponse(
-                question=question,
-                answer=answer,
-            )
+            return QuestionAnswerResponse(question=question, answer=answer)
 
         except Exception as exc:
             raise HTTPException(
@@ -660,22 +670,13 @@ def answer_question(payload: QuestionCreate):
                     row = cur.fetchone()
 
             if not row:
-                answer = (
-                    "No sales data is available to answer this question."
-                )
+                answer = "No sales data is available to answer this question."
             else:
                 quarter = row[0]
                 margin = float(row[1])
+                answer = f"{quarter} had the highest margin with ${margin:,.2f}."
 
-                answer = (
-                    f"{quarter} had the highest margin "
-                    f"with ${margin:,.2f}."
-                )
-
-            return QuestionAnswerResponse(
-                question=question,
-                answer=answer,
-            )
+            return QuestionAnswerResponse(question=question, answer=answer)
 
         except Exception as exc:
             raise HTTPException(
@@ -713,22 +714,13 @@ def answer_question(payload: QuestionCreate):
                     row = cur.fetchone()
 
             if not row:
-                answer = (
-                    "No sales data is available to answer this question."
-                )
+                answer = "No sales data is available to answer this question."
             else:
                 quarter = row[0]
                 margin = float(row[1])
+                answer = f"{quarter} had the lowest margin with ${margin:,.2f}."
 
-                answer = (
-                    f"{quarter} had the lowest margin "
-                    f"with ${margin:,.2f}."
-                )
-
-            return QuestionAnswerResponse(
-                question=question,
-                answer=answer,
-            )
+            return QuestionAnswerResponse(question=question, answer=answer)
 
         except Exception as exc:
             raise HTTPException(
@@ -766,22 +758,13 @@ def answer_question(payload: QuestionCreate):
                     row = cur.fetchone()
 
             if not row:
-                answer = (
-                    "No sales data is available to answer this question."
-                )
+                answer = "No sales data is available to answer this question."
             else:
                 category = row[0]
                 revenue = float(row[1])
+                answer = f"{category} generated the highest revenue with ${revenue:,.2f}."
 
-                answer = (
-                    f"{category} generated the highest revenue "
-                    f"with ${revenue:,.2f}."
-                )
-
-            return QuestionAnswerResponse(
-                question=question,
-                answer=answer,
-            )
+            return QuestionAnswerResponse(question=question, answer=answer)
 
         except Exception as exc:
             raise HTTPException(
@@ -819,22 +802,13 @@ def answer_question(payload: QuestionCreate):
                     row = cur.fetchone()
 
             if not row:
-                answer = (
-                    "No sales data is available to answer this question."
-                )
+                answer = "No sales data is available to answer this question."
             else:
                 category = row[0]
                 margin = float(row[1])
+                answer = f"{category} generated the highest margin with ${margin:,.2f}."
 
-                answer = (
-                    f"{category} generated the highest margin "
-                    f"with ${margin:,.2f}."
-                )
-
-            return QuestionAnswerResponse(
-                question=question,
-                answer=answer,
-            )
+            return QuestionAnswerResponse(question=question, answer=answer)
 
         except Exception as exc:
             raise HTTPException(
@@ -872,22 +846,13 @@ def answer_question(payload: QuestionCreate):
                     row = cur.fetchone()
 
             if not row:
-                answer = (
-                    "No sales data is available to answer this question."
-                )
+                answer = "No sales data is available to answer this question."
             else:
                 country = row[0]
                 revenue = float(row[1])
+                answer = f"{country} generated the highest revenue with ${revenue:,.2f}."
 
-                answer = (
-                    f"{country} generated the highest revenue "
-                    f"with ${revenue:,.2f}."
-                )
-
-            return QuestionAnswerResponse(
-                question=question,
-                answer=answer,
-            )
+            return QuestionAnswerResponse(question=question, answer=answer)
 
         except Exception as exc:
             raise HTTPException(
@@ -925,22 +890,13 @@ def answer_question(payload: QuestionCreate):
                     row = cur.fetchone()
 
             if not row:
-                answer = (
-                    "No sales data is available to answer this question."
-                )
+                answer = "No sales data is available to answer this question."
             else:
                 region = row[0]
                 revenue = float(row[1])
+                answer = f"{region} generated the highest revenue with ${revenue:,.2f}."
 
-                answer = (
-                    f"{region} generated the highest revenue "
-                    f"with ${revenue:,.2f}."
-                )
-
-            return QuestionAnswerResponse(
-                question=question,
-                answer=answer,
-            )
+            return QuestionAnswerResponse(question=question, answer=answer)
 
         except Exception as exc:
             raise HTTPException(
@@ -978,22 +934,13 @@ def answer_question(payload: QuestionCreate):
                     row = cur.fetchone()
 
             if not row:
-                answer = (
-                    "No sales data is available to answer this question."
-                )
+                answer = "No sales data is available to answer this question."
             else:
                 product = row[0]
                 revenue = float(row[1])
+                answer = f"{product} generated the highest revenue with ${revenue:,.2f}."
 
-                answer = (
-                    f"{product} generated the highest revenue "
-                    f"with ${revenue:,.2f}."
-                )
-
-            return QuestionAnswerResponse(
-                question=question,
-                answer=answer,
-            )
+            return QuestionAnswerResponse(question=question, answer=answer)
 
         except Exception as exc:
             raise HTTPException(
@@ -1002,28 +949,75 @@ def answer_question(payload: QuestionCreate):
             )
 
     # --------------------------------------------------------
-    # TOTAL REVENUE
+    # TOTAL / FILTERED METRIC HELPERS
     # --------------------------------------------------------
 
-    if (
-        "revenue" in question_lower
-        and "total" in question_lower
-    ):
-        query = """
-            SELECT
-                COALESCE(SUM(revenue), 0)
-            FROM fct_sales
-        """
+    def build_question_filters(conn, question_text):
+        filter_columns = {
+            "region": "region",
+            "country": "country",
+            "product_name": "product_name",
+            "category": "category",
+            "quarter": "quarter",
+        }
 
+        conditions = []
+        params = []
+
+        with conn.cursor() as cur:
+            for column, sql_column in filter_columns.items():
+                cur.execute(
+                    f"SELECT DISTINCT {sql_column} FROM fct_sales WHERE {sql_column} IS NOT NULL"
+                )
+                values = [row[0] for row in cur.fetchall()]
+
+                matches = [
+                    value
+                    for value in values
+                    if str(value).lower() in question_text
+                ]
+
+                if matches:
+                    # Use the longest match when values overlap.
+                    value = max(matches, key=lambda item: len(str(item)))
+                    conditions.append(f"{sql_column} = %s")
+                    params.append(value)
+
+        return conditions, params
+
+    # --------------------------------------------------------
+    # FILTERED / TOTAL REVENUE
+    # --------------------------------------------------------
+
+    if "revenue" in question_lower and (
+        "total" in question_lower
+        or " for " in f" {question_lower} "
+    ):
         try:
             with get_db_connection() as conn:
+                conditions, params = build_question_filters(
+                    conn,
+                    question_lower,
+                )
+
+                query = """
+                    SELECT COALESCE(SUM(revenue), 0)
+                    FROM fct_sales
+                """
+
+                if conditions:
+                    query += " WHERE " + " AND ".join(conditions)
+
                 with conn.cursor() as cur:
-                    cur.execute(query)
+                    cur.execute(query, params)
                     row = cur.fetchone()
 
             revenue = float(row[0] or 0)
 
-            answer = f"Total revenue is ${revenue:,.2f}."
+            if conditions:
+                answer = f"The total revenue for the requested filters is ${revenue:,.2f}."
+            else:
+                answer = f"Total revenue is ${revenue:,.2f}."
 
             return QuestionAnswerResponse(
                 question=question,
@@ -1037,28 +1031,38 @@ def answer_question(payload: QuestionCreate):
             )
 
     # --------------------------------------------------------
-    # TOTAL MARGIN
+    # FILTERED / TOTAL MARGIN
     # --------------------------------------------------------
 
-    if (
-        "margin" in question_lower
-        and "total" in question_lower
+    if "margin" in question_lower and (
+        "total" in question_lower
+        or " for " in f" {question_lower} "
     ):
-        query = """
-            SELECT
-                COALESCE(SUM(margin), 0)
-            FROM fct_sales
-        """
-
         try:
             with get_db_connection() as conn:
+                conditions, params = build_question_filters(
+                    conn,
+                    question_lower,
+                )
+
+                query = """
+                    SELECT COALESCE(SUM(margin), 0)
+                    FROM fct_sales
+                """
+
+                if conditions:
+                    query += " WHERE " + " AND ".join(conditions)
+
                 with conn.cursor() as cur:
-                    cur.execute(query)
+                    cur.execute(query, params)
                     row = cur.fetchone()
 
             margin = float(row[0] or 0)
 
-            answer = f"Total margin is ${margin:,.2f}."
+            if conditions:
+                answer = f"The total margin for the requested filters is ${margin:,.2f}."
+            else:
+                answer = f"Total margin is ${margin:,.2f}."
 
             return QuestionAnswerResponse(
                 question=question,
@@ -1072,33 +1076,37 @@ def answer_question(payload: QuestionCreate):
             )
 
     # --------------------------------------------------------
-    # TOTAL ORDERS
+    # FILTERED / TOTAL ORDERS
     # --------------------------------------------------------
 
-    if (
-        "orders" in question_lower
-        and (
-            "total" in question_lower
-            or "how many" in question_lower
-            or "number" in question_lower
-        )
+    if "orders" in question_lower and (
+        "total" in question_lower
+        or "how many" in question_lower
+        or "number" in question_lower
+        or " for " in f" {question_lower} "
     ):
-        query = """
-            SELECT COUNT(*)
-            FROM fct_sales
-        """
-
         try:
             with get_db_connection() as conn:
+                conditions, params = build_question_filters(
+                    conn,
+                    question_lower,
+                )
+
+                query = "SELECT COUNT(*) FROM fct_sales"
+
+                if conditions:
+                    query += " WHERE " + " AND ".join(conditions)
+
                 with conn.cursor() as cur:
-                    cur.execute(query)
+                    cur.execute(query, params)
                     row = cur.fetchone()
 
             total_orders = int(row[0] or 0)
 
-            answer = (
-                f"Total number of orders is {total_orders}."
-            )
+            if conditions:
+                answer = f"The total number of orders for the requested filters is {total_orders}."
+            else:
+                answer = f"Total number of orders is {total_orders}."
 
             return QuestionAnswerResponse(
                 question=question,
@@ -1120,7 +1128,8 @@ def answer_question(payload: QuestionCreate):
         answer=(
             "I can currently answer questions about total revenue, "
             "total margin, total orders, highest or lowest quarterly "
-            "revenue or margin, and highest revenue or margin by "
-            "category, country, region, or product."
+            "revenue or margin, highest revenue or margin by category, "
+            "country, region, or product, and filtered revenue, margin, "
+            "or order questions."
         ),
     )

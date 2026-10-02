@@ -277,7 +277,7 @@ def test_answer_question_total_revenue():
 
 
 # ============================================================
-# NEW ASK METRICMIND TESTS
+# ASK METRICMIND - EXISTING TESTS
 # ============================================================
 
 def test_answer_question_highest_category_revenue():
@@ -373,3 +373,164 @@ def test_answer_question_highest_product_revenue():
     )
     assert "highest revenue" in data["answer"].lower()
     assert "$" in data["answer"]
+
+
+# ============================================================
+# ASK METRICMIND - FILTER-AWARE TESTS
+# ============================================================
+
+def test_answer_question_total_revenue_region():
+    response = client.post(
+        "/questions/answer",
+        json={
+            "question": "What is the total revenue for Europe?"
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["question"] == (
+        "What is the total revenue for Europe?"
+    )
+    assert "total revenue" in data["answer"].lower()
+    assert "3,219,668.93" in data["answer"]
+
+
+def test_answer_question_total_revenue_country():
+    response = client.post(
+        "/questions/answer",
+        json={
+            "question": "What is the total revenue for Germany?"
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["question"] == (
+        "What is the total revenue for Germany?"
+    )
+    assert "total revenue" in data["answer"].lower()
+    assert "521,583.10" in data["answer"]
+
+
+def test_answer_question_total_margin_category():
+    response = client.post(
+        "/questions/answer",
+        json={
+            "question": "What is the total margin for Software?"
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["question"] == (
+        "What is the total margin for Software?"
+    )
+    assert "total margin" in data["answer"].lower()
+    assert "1,991,304.02" in data["answer"]
+
+
+def test_answer_question_total_revenue_quarter():
+    response = client.post(
+        "/questions/answer",
+        json={
+            "question": "What is the total revenue for Q2?"
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["question"] == (
+        "What is the total revenue for Q2?"
+    )
+    assert "total revenue" in data["answer"].lower()
+    assert "1,484,038.25" in data["answer"]
+
+
+def test_answer_question_total_revenue_product():
+    response = client.post(
+        "/questions/answer",
+        json={
+            "question": "What is the total revenue for Analytics Suite?"
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["question"] == (
+        "What is the total revenue for Analytics Suite?"
+    )
+    assert "total revenue" in data["answer"].lower()
+    assert "2,399,815.71" in data["answer"]
+
+
+def test_answer_question_total_orders_region():
+    response = client.post(
+        "/questions/answer",
+        json={
+            "question": "What is the total number of orders for Europe?"
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["question"] == (
+        "What is the total number of orders for Europe?"
+    )
+    assert "total number of orders" in data["answer"].lower()
+    assert "576" in data["answer"]
+
+
+def test_answer_question_total_revenue_combined_filters():
+    response = client.post(
+        "/questions/answer",
+        json={
+            "question": "What is the total revenue for Germany in Q2?"
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["question"] == (
+        "What is the total revenue for Germany in Q2?"
+    )
+    assert "total revenue" in data["answer"].lower()
+    assert "132,141.48" in data["answer"]
+
+
+# ============================================================
+# ASK METRICMIND - FALLBACK TEST
+# ============================================================
+
+def test_answer_question_unsupported():
+    response = client.post(
+        "/questions/answer",
+        json={
+            "question": "What is the average revenue by customer?"
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["question"] == (
+        "What is the average revenue by customer?"
+    )
+    assert "currently answer questions" in data["answer"].lower()
+    assert "total revenue" in data["answer"].lower()
+    assert "filtered revenue" in data["answer"].lower()

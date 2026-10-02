@@ -86,6 +86,8 @@ export default function Home() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   async function loadSummary(queryString = "", signal?: AbortSignal) {
     const response = await fetch(`/backend/summary${queryString}`, { signal });
@@ -122,6 +124,7 @@ export default function Home() {
           loadSummary(query, controller.signal),
           loadSales(query, controller.signal),
         ]);
+        setLastUpdated(new Date());
       } catch (loadError) {
         if (controller.signal.aborted) return;
         setError(loadError instanceof Error ? loadError.message : "Unable to load dashboard data.");
@@ -132,7 +135,7 @@ export default function Home() {
 
     void loadDashboard();
     return () => controller.abort();
-  }, [filters]);
+  }, [filters, reloadKey]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -146,6 +149,10 @@ export default function Home() {
 
   function updateFilter(key: keyof Filters, value: string) {
     setFilters((current) => ({ ...current, [key]: value }));
+  }
+
+  function retryDashboard() {
+    setReloadKey((current) => current + 1);
   }
 
   const quarterRevenue = ["Q1", "Q2", "Q3", "Q4"].map((quarter) => ({
@@ -180,9 +187,12 @@ export default function Home() {
             <p className="brand-caption">Business intelligence, made clearer</p>
           </div>
         </div>
-        <span className={`status-pill ${error ? "status-error" : ""}`}>
-          <span className="status-dot" /> {loading ? "Updating data" : error ? "API unavailable" : "Live data"}
-        </span>
+        <div className="topbar-status">
+          <span className={`status-pill ${error ? "status-error" : ""}`}>
+            <span className="status-dot" /> {loading ? "Updating data" : error ? "API unavailable" : "Live data"}
+          </span>
+          <span className="last-updated">{lastUpdated ? `Updated ${lastUpdated.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : "Not synced yet"}</span>
+        </div>
       </header>
 
       <main className="dashboard">
@@ -216,7 +226,14 @@ export default function Home() {
           </div>
         </section>
 
-        {error && <p className="error-banner" role="alert">Could not load dashboard data: {error} Confirm the backend is running at 127.0.0.1:8000.</p>}
+        {error && (
+          <div className="error-banner" role="alert">
+            <span>Could not load dashboard data: {error} Confirm the backend is running at 127.0.0.1:8000.</span>
+            <button className="retry-button" type="button" onClick={retryDashboard} disabled={loading}>
+              {loading ? "Retrying..." : "Retry"}
+            </button>
+          </div>
+        )}
 
         <section className="kpi-grid" aria-label="Sales summary">
           {[
@@ -280,18 +297,23 @@ export default function Home() {
           <section className="panel chat-panel">
             <div className="panel-heading">
               <div><p className="panel-kicker">Ask MetricMind</p><h2>Business question</h2></div>
-              <span className="coming-soon">AI later</span>
+              <span className="coming-soon">AI connection pending</span>
             </div>
             <form className="question-form" onSubmit={handleSubmit}>
               <label htmlFor="business-question">What would you like to know?</label>
               <textarea id="business-question" value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="e.g. Which quarter had the highest revenue?" rows={3} />
+              <div className="prompt-list" aria-label="Starter questions">
+                {["How are sales performing?", "Compare revenue by quarter"].map((prompt) => (
+                  <button className="prompt-button" key={prompt} type="button" onClick={() => setQuestion(prompt)}>{prompt}</button>
+                ))}
+              </div>
               <div className="form-footer">
-                <span className="helper-text">AI integration will be connected later.</span>
-                <button type="submit">Save question <span aria-hidden="true">-&gt;</span></button>
+                <span className="helper-text">Questions stay in this page; AI is not connected.</span>
+                <button type="submit">Queue question <span aria-hidden="true">-&gt;</span></button>
               </div>
             </form>
             <div className="chat-response" aria-live="polite">
-              {submittedQuestion ? <><p className="question-echo">“{submittedQuestion}”</p><p className="response-message">AI integration will be connected later.</p></> : <p className="helper-text">Your question will be ready for future analysis.</p>}
+              {submittedQuestion ? <><p className="question-echo">“{submittedQuestion}”</p><p className="response-message">Saved locally. MetricMind AI will be connected in a later phase.</p></> : <p className="helper-text">Add a question to prepare it for a future AI connection.</p>}
             </div>
           </section>
         </div>

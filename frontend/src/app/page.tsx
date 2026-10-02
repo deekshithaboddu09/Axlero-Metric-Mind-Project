@@ -88,6 +88,7 @@ export default function Home() {
   const [error, setError] = useState("");
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
+  const initialLoading = loading && lastUpdated === null;
 
   async function loadSummary(queryString = "", signal?: AbortSignal) {
     const response = await fetch(`/backend/summary${queryString}`, { signal });
@@ -107,6 +108,11 @@ export default function Home() {
 
   useEffect(() => {
     const controller = new AbortController();
+    let timedOut = false;
+    const timeoutId = window.setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, 12000);
     const params = new URLSearchParams();
 
     Object.entries(filters).forEach(([key, value]) => {
@@ -126,15 +132,20 @@ export default function Home() {
         ]);
         setLastUpdated(new Date());
       } catch (loadError) {
-        if (controller.signal.aborted) return;
-        setError(loadError instanceof Error ? loadError.message : "Unable to load dashboard data.");
+        if (controller.signal.aborted && !timedOut) return;
+        setError(timedOut
+          ? "The data request timed out. Check the backend and database, then retry."
+          : loadError instanceof Error ? loadError.message : "Unable to load dashboard data.");
       } finally {
-        if (!controller.signal.aborted) setLoading(false);
+        if (!controller.signal.aborted || timedOut) setLoading(false);
       }
     }
 
     void loadDashboard();
-    return () => controller.abort();
+    return () => {
+      window.clearTimeout(timeoutId);
+      controller.abort();
+    };
   }, [filters, reloadKey]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -242,9 +253,9 @@ export default function Home() {
             { label: "Total Cost", value: formatMoney(summary.total_cost), suffix: "USD" },
             { label: "Total Margin", value: formatMoney(summary.total_margin), suffix: "USD" },
           ].map(({ label, value, suffix }, index) => (
-            <article className="kpi-item" key={label}>
+            <article className={`kpi-item ${initialLoading ? "kpi-loading" : ""}`} key={label} aria-busy={loading}>
               <div className="kpi-label"><span className={`kpi-mark kpi-mark-${index + 1}`} />{label}</div>
-              <strong aria-live="polite">{loading ? "Loading..." : error ? "-" : value}</strong>
+              {initialLoading ? <span className="skeleton-value" aria-label="Loading value" /> : <strong aria-live="polite" title={error ? `Last loaded value; refresh failed: ${error}` : value}>{lastUpdated !== null || !error ? value : "Unavailable"}</strong>}
               <span className="kpi-suffix">{suffix}</span>
             </article>
           ))}
@@ -256,7 +267,7 @@ export default function Home() {
               <p className="panel-kicker">Transactions</p>
               <h2>Recent sales</h2>
             </div>
-            <span className="record-count">{loading ? "Loading records" : `${sales.length} records`}</span>
+            <span className="record-count" aria-live="polite">{loading ? lastUpdated ? "Refreshing records..." : "Loading records..." : `${sales.length} records`}</span>
           </div>
           <div className="table-wrap">
             <table>
@@ -266,13 +277,32 @@ export default function Home() {
               <tbody>
                 {sales.map((sale, index) => (
                   <tr key={`${sale.order_id ?? "order"}-${index}`}>
-                    <td>{sale.order_id ?? "-"}</td><td>{sale.order_date ?? "-"}</td><td>{sale.country ?? "-"}</td><td>{sale.region ?? "-"}</td><td>{sale.product_name ?? "-"}</td><td>{sale.category ?? "-"}</td><td>{formatMoney(sale.revenue)}</td><td>{formatMoney(sale.total_cost)}</td><td>{formatMoney(sale.margin)}</td><td>{sale.quarter ?? "-"}</td>
+                    <td className="long-cell" title={String(sale.order_id ?? "-")}>{sale.order_id ?? "-"}</td>
+                    <td>{sale.order_date ?? "-"}</td>
+                    <td className="long-cell" title={sale.country ?? "-"}>{sale.country ?? "-"}</td>
+                    <td className="long-cell" title={sale.region ?? "-"}>{sale.region ?? "-"}</td>
+                    <td className="long-cell product-cell" title={sale.product_name ?? "-"}>{sale.product_name ?? "-"}</td>
+                    <td className="long-cell" title={sale.category ?? "-"}>{sale.category ?? "-"}</td>
+                    <td>{formatMoney(sale.revenue)}</td><td>{formatMoney(sale.total_cost)}</td><td>{formatMoney(sale.margin)}</td><td>{sale.quarter ?? "-"}</td>
                   </tr>
                 ))}
-                {!loading && sales.length === 0 && <tr><td className="table-empty" colSpan={10}>{error ? "Sales records are unavailable." : "No sales records match these filters."}</td></tr>}
+                {initialLoading && Array.from({ length: 4 }, (_, index) => (
+                  <tr className="skeleton-row" key={`loading-row-${index}`} aria-hidden="true">
+                    {Array.from({ length: 10 }, (_, cellIndex) => <td key={cellIndex}><span /></td>)}
+                  </tr>
+                ))}
+                {!loading && sales.length === 0 && (
+                  <tr>
+                    <td className="table-empty" colSpan={10}>
+                      <strong>{error ? "Sales data is unavailable" : Object.values(filters).some(Boolean) ? "No sales match these filters" : "No sales records yet"}</strong>
+                      <span>{error ? "Check the API connection and retry the dashboard." : Object.values(filters).some(Boolean) ? "Clear one or more filters to broaden the results." : "Records will appear here when the sales API returns data."}</span>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
+          {loading && lastUpdated !== null && <p className="refresh-note" role="status">Updating filtered results. The last loaded data remains visible.</p>}
         </section>
 
         <div className="insight-grid">
@@ -284,14 +314,15 @@ export default function Home() {
             <div className="quarter-chart" role="img" aria-label="Revenue by quarter from currently loaded sales records">
               {quarterRevenue.map(({ quarter, revenue }) => (
                 <div className="quarter-column" key={quarter}>
-                  <strong>{sales.length ? formatMoney(revenue) : "-"}</strong>
+                  <strong title={sales.length ? formatMoney(revenue) : "No loaded revenue"}>{sales.length ? formatMoney(revenue) : "-"}</strong>
                   <div className="quarter-track"><span style={{ height: maxQuarterRevenue ? `${Math.max((revenue / maxQuarterRevenue) * 100, revenue ? 2 : 0)}%` : "0%" }} /></div>
                   <span className="quarter-label">{quarter}</span>
                 </div>
               ))}
             </div>
-            {loading && <p className="chart-status">Refreshing chart data...</p>}
-            {!loading && sales.length === 0 && <p className="chart-status">Quarter values will appear when sales records are available.</p>}
+            {initialLoading && <p className="chart-status" role="status">Loading revenue data...</p>}
+            {!initialLoading && loading && <p className="chart-status" role="status">Refreshing. Bars show the last loaded records until the request completes.</p>}
+            {!loading && sales.length === 0 && <p className="chart-status">{error ? "Quarter totals are unavailable until sales data loads." : "No sales records are available for the current filters."}</p>}
           </section>
 
           <section className="panel chat-panel">

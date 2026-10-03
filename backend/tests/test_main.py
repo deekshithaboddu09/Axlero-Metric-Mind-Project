@@ -237,7 +237,84 @@ def test_get_questions():
 
     data = response.json()
 
-    assert isinstance(data, list)
+    assert isinstance(data, dict)
+    assert "total" in data
+    assert "limit" in data
+    assert "offset" in data
+    assert "questions" in data
+
+    assert isinstance(data["total"], int)
+    assert isinstance(data["limit"], int)
+    assert isinstance(data["offset"], int)
+    assert isinstance(data["questions"], list)
+
+    if len(data["questions"]) > 0:
+        assert "id" in data["questions"][0]
+        assert "question" in data["questions"][0]
+        assert "created_at" in data["questions"][0]
+
+
+def test_get_questions_pagination():
+    response = client.get("/questions?limit=10&offset=0")
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert isinstance(data, dict)
+    assert data["limit"] == 10
+    assert data["offset"] == 0
+    assert isinstance(data["total"], int)
+    assert isinstance(data["questions"], list)
+    assert len(data["questions"]) <= 10
+
+    for question in data["questions"]:
+        assert "id" in question
+        assert "question" in question
+        assert "created_at" in question
+
+
+def test_get_questions_invalid_limit():
+    response = client.get("/questions?limit=0&offset=0")
+
+    assert response.status_code == 422
+
+
+def test_get_questions_invalid_offset():
+    response = client.get("/questions?limit=10&offset=-1")
+
+    assert response.status_code == 422
+
+
+def test_get_questions_search():
+    response = client.get("/questions?search=revenue&limit=10&offset=0")
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert isinstance(data, dict)
+    assert data["limit"] == 10
+    assert data["offset"] == 0
+    assert isinstance(data["total"], int)
+    assert isinstance(data["questions"], list)
+    assert data["total"] >= len(data["questions"])
+
+    for question in data["questions"]:
+        assert "revenue" in question["question"].lower()
+
+
+def test_get_questions_search_no_match():
+    response = client.get(
+        "/questions?search=xyz_nonexistent_question_12345&limit=10&offset=0"
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["total"] == 0
+    assert data["questions"] == []
 
 
 def test_answer_question_highest_revenue():

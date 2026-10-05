@@ -1,5 +1,5 @@
 import os
-from datetime import date, datetime
+from datetime import date
 
 import psycopg
 from dotenv import load_dotenv
@@ -89,13 +89,11 @@ class QuestionResponse(BaseModel):
     question: str
     created_at: datetime
 
-
 class QuestionHistoryResponse(BaseModel):
     total: int
     limit: int
     offset: int
     questions: list[QuestionResponse]
-
 
 class QuestionAnswerResponse(BaseModel):
     question: str
@@ -444,7 +442,7 @@ def create_question(payload: QuestionCreate):
                     """
                     INSERT INTO saved_questions (question)
                     VALUES (%s)
-                    RETURNING id, question, created_at
+                    RETURNING id, question,created_at
                     """,
                     (question,),
                 )
@@ -469,7 +467,7 @@ def create_question(payload: QuestionCreate):
 # GET SAVED QUESTIONS API
 # ============================================================
 
-@app.get("/questions", response_model=QuestionHistoryResponse)
+@app.get("/questions", response_model=list[QuestionResponse])
 def get_questions(
     search: str | None = Query(default=None),
     limit: int = Query(default=20, ge=1, le=100),
@@ -489,69 +487,32 @@ def get_questions(
                     """
                 )
 
-                search_text = search.strip() if search else None
-
-                count_query = """
-                    SELECT COUNT(*)
-                    FROM saved_questions
-                    WHERE 1=1
-                """
-                count_params = []
-
-                if search_text:
-                    count_query += " AND question ILIKE %s"
-                    count_params.append(f"%{search_text}%")
-
-                cur.execute(count_query, count_params)
-                total = cur.fetchone()[0]
-
-                query = """
+                cur.execute(
+                    """
                     SELECT
                         id,
-                        question,
-                        created_at
+                        question
                     FROM saved_questions
-                    WHERE 1=1
-                """
-                params = []
-
-                if search_text:
-                    query += " AND question ILIKE %s"
-                    params.append(f"%{search_text}%")
-
-                query += """
                     ORDER BY created_at DESC, id DESC
-                    LIMIT %s
-                    OFFSET %s
-                """
-                params.extend([limit, offset])
+                    """
+                )
 
-                cur.execute(query, params)
                 rows = cur.fetchall()
                 conn.commit()
 
-        questions = [
+        return [
             QuestionResponse(
                 id=row[0],
                 question=row[1],
-                created_at=row[2],
             )
             for row in rows
         ]
-
-        return QuestionHistoryResponse(
-            total=int(total),
-            limit=limit,
-            offset=offset,
-            questions=questions,
-        )
 
     except Exception as exc:
         raise HTTPException(
             status_code=500,
             detail=f"Questions request failed: {exc}",
         )
-
 
 
 # ============================================================
@@ -571,37 +532,8 @@ def answer_question(payload: QuestionCreate):
             detail="Question cannot be empty",
         )
 
-    
     question_lower = question.lower()
-        # Save the question automatically in question history
-    try:
-        with get_db_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    CREATE TABLE IF NOT EXISTS saved_questions (
-                        id SERIAL PRIMARY KEY,
-                        question TEXT NOT NULL,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )
-                    """
-                )
 
-                cur.execute(
-                    """
-                    INSERT INTO saved_questions (question)
-                    VALUES (%s)
-                    """,
-                    (question,),
-                )
-
-                conn.commit()
-
-    except Exception as exc:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Question history save failed: {exc}",
-        )
     # --------------------------------------------------------
     # HIGHEST QUARTERLY REVENUE
     # --------------------------------------------------------

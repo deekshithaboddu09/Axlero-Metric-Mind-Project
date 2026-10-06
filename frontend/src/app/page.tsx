@@ -29,7 +29,20 @@ type Filters = {
   category: string;
   quarter: string;
 };
-type ChatState = "idle" | "queued" | "loading" | "error";
+type ChatState = "idle" | "loading" | "answered" | "error";
+
+type QuestionAnswer = {
+  question: string;
+  answer: string;
+};
+
+type SavedQuestion = {
+  id?: string | number;
+  question: string;
+  created_at: string;
+};
+
+const QUESTION_PAGE_SIZE = 10;
 
 const initialSummary: Summary = {
   total_orders: 0,
@@ -73,6 +86,62 @@ function getSales(payload: unknown): Sale[] {
   throw new Error("The sales API returned an unexpected response.");
 }
 
+function getQuestionAnswer(payload: unknown): QuestionAnswer {
+  if (
+    payload &&
+    typeof payload === "object" &&
+    "question" in payload &&
+    typeof payload.question === "string" &&
+    "answer" in payload &&
+    typeof payload.answer === "string"
+  ) {
+    return { question: payload.question, answer: payload.answer };
+  }
+  throw new Error("The question API returned an unexpected response.");
+}
+
+function getQuestionHistory(payload: unknown): { questions: SavedQuestion[]; total: number | null } {
+  let records: unknown[];
+  let total: number | null = null;
+
+  if (Array.isArray(payload)) {
+    records = payload;
+  } else if (payload && typeof payload === "object" && "questions" in payload && Array.isArray(payload.questions)) {
+    records = payload.questions;
+    if ("total" in payload && typeof payload.total === "number") total = payload.total;
+  } else {
+    throw new Error("The question history API returned an unexpected response.");
+  }
+
+  const questions = records.map((record): SavedQuestion => {
+    if (
+      !record ||
+      typeof record !== "object" ||
+      !("question" in record) ||
+      typeof record.question !== "string" ||
+      !("created_at" in record) ||
+      typeof record.created_at !== "string"
+    ) {
+      throw new Error("A saved question was missing its question or creation time.");
+    }
+
+    return {
+      id: "id" in record && (typeof record.id === "string" || typeof record.id === "number") ? record.id : undefined,
+      question: record.question,
+      created_at: record.created_at,
+    };
+  });
+
+  return { questions, total };
+}
+
+function formatQuestionTimestamp(value: string) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? value
+    : new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short" }).format(date);
+}
+
 function buildFilterQuery(filters: Filters) {
   const params = new URLSearchParams();
 
@@ -86,8 +155,17 @@ function buildFilterQuery(filters: Filters) {
 export default function Home() {
   const [question, setQuestion] = useState("");
   const [submittedQuestion, setSubmittedQuestion] = useState("");
+  const [chatAnswer, setChatAnswer] = useState("");
   const [chatState, setChatState] = useState<ChatState>("idle");
   const [chatError, setChatError] = useState("");
+  const [savedQuestions, setSavedQuestions] = useState<SavedQuestion[]>([]);
+  const [questionSearch, setQuestionSearch] = useState("");
+  const [appliedQuestionSearch, setAppliedQuestionSearch] = useState("");
+  const [questionOffset, setQuestionOffset] = useState(0);
+  const [questionTotal, setQuestionTotal] = useState<number | null>(null);
+  const [historyLoading, setHistoryLoading] = useState(true);
+  const [historyError, setHistoryError] = useState("");
+  const [historyReloadKey, setHistoryReloadKey] = useState(0);
   const [summary, setSummary] = useState<Summary>(initialSummary);
   const [sales, setSales] = useState<Sale[]>([]);
   const [filters, setFilters] = useState<Filters>({
@@ -154,15 +232,81 @@ export default function Home() {
     };
   }, [filterQuery, reloadKey]);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadQuestionHistory() {
+      setHistoryLoading(true);
+      setHistoryError("");
+      const params = new URLSearchParams({
+        limit: String(QUESTION_PAGE_SIZE),
+        offset: String(questionOffset),
+      });
+      if (appliedQuestionSearch) params.set("search", appliedQuestionSearch);
+
+      try {
+        const response = await fetch(`/backend/questions?${params.toString()}`, { signal: controller.signal });
+        if (!response.ok) throw new Error(`Question history request failed (${response.status}).`);
+
+        const result = getQuestionHistory(await response.json());
+        setSavedQuestions(result.questions.sort((left, right) => Date.parse(right.created_at) - Date.parse(left.created_at)));
+        setQuestionTotal(result.total);
+      } catch (loadError) {
+        if (controller.signal.aborted) return;
+        setHistoryError(loadError instanceof TypeError
+          ? "Could not reach the MetricMind API. Check that the backend is running and try again."
+          : loadError instanceof Error ? loadError.message : "Unable to load question history.");
+        setSavedQuestions([]);
+        setQuestionTotal(null);
+      } finally {
+        if (!controller.signal.aborted) setHistoryLoading(false);
+      }
+    }
+
+    void loadQuestionHistory();
+    return () => controller.abort();
+  }, [appliedQuestionSearch, questionOffset, historyReloadKey]);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const trimmedQuestion = question.trim();
 
-    if (trimmedQuestion) {
-      setSubmittedQuestion(trimmedQuestion);
-      setChatError("");
-      setChatState("queued");
+    if (!trimmedQuestion || chatState === "loading") return;
+
+    setSubmittedQuestion(trimmedQuestion);
+    setChatAnswer("");
+    setChatError("");
+    setChatState("loading");
+
+    try {
+      const response = await fetch("/backend/questions/answer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: trimmedQuestion }),
+      });
+      const payload: unknown = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        let message = `Question request failed (${response.status}).`;
+        if (payload && typeof payload === "object") {
+          if ("detail" in payload && typeof payload.detail === "string") message = payload.detail;
+          else if ("message" in payload && typeof payload.message === "string") message = payload.message;
+        }
+        throw new Error(message);
+      }
+
+      const result = getQuestionAnswer(payload);
+      setSubmittedQuestion(result.question);
+      setChatAnswer(result.answer);
       setQuestion("");
+      setChatState("answered");
+      setQuestionOffset(0);
+      setHistoryReloadKey((current) => current + 1);
+    } catch (requestError) {
+      setChatError(requestError instanceof TypeError
+        ? "Could not reach the MetricMind API. Check that the backend is running and try again."
+        : requestError instanceof Error ? requestError.message : "Unable to get an answer. Please try again.");
+      setChatState("error");
     }
   }
 
@@ -173,6 +317,22 @@ export default function Home() {
   function retryDashboard() {
     setReloadKey((current) => current + 1);
   }
+
+  function handleQuestionSearch(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setQuestionOffset(0);
+    setAppliedQuestionSearch(questionSearch.trim());
+  }
+
+  function clearQuestionSearch() {
+    setQuestionSearch("");
+    setAppliedQuestionSearch("");
+    setQuestionOffset(0);
+  }
+
+  const hasMoreQuestions = questionTotal !== null
+    ? questionOffset + QUESTION_PAGE_SIZE < questionTotal
+    : savedQuestions.length === QUESTION_PAGE_SIZE;
 
   const quarterRevenue = ["Q1", "Q2", "Q3", "Q4"].map((quarter) => ({
     quarter,
@@ -353,46 +513,101 @@ export default function Home() {
           <section className="panel chat-panel">
             <div className="panel-heading">
               <div><p className="panel-kicker">Ask MetricMind</p><h2>Business question</h2></div>
-              <span className="coming-soon">AI connection pending</span>
+              <span className="coming-soon">Backend API</span>
             </div>
             <form className="question-form" onSubmit={handleSubmit}>
               <label htmlFor="business-question">What would you like to know?</label>
-              <textarea id="business-question" value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="e.g. Which quarter had the highest revenue?" rows={4} />
+              <textarea id="business-question" value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="e.g. Which quarter had the highest revenue?" rows={4} disabled={chatState === "loading"} />
               <div className="prompt-list" aria-label="Starter questions">
                 {["How are sales performing?", "Compare revenue by quarter"].map((prompt) => (
-                  <button className="prompt-button" key={prompt} type="button" onClick={() => setQuestion(prompt)}>{prompt}</button>
+                  <button className="prompt-button" key={prompt} type="button" onClick={() => setQuestion(prompt)} disabled={chatState === "loading"}>{prompt}</button>
                 ))}
               </div>
               <div className="form-footer">
-                <span className="helper-text">Saved locally only. No AI request is sent yet.</span>
+                <span className="helper-text">Answers are provided by the MetricMind backend.</span>
                 <button className="send-question" type="submit" disabled={!question.trim() || chatState === "loading"}>Send question <span aria-hidden="true">-&gt;</span></button>
               </div>
             </form>
             <section className={`chat-response chat-response-${chatState}`} aria-label="Response area" aria-live="polite">
               <p className="response-label">Response</p>
               {chatState === "loading" ? (
-                <div className="chat-loading" role="status"><span className="chat-spinner" aria-hidden="true" /> Preparing your answer...</div>
+                <>
+                  <p className="question-echo"><strong>Question</strong> {submittedQuestion}</p>
+                  <div className="chat-loading" role="status"><span className="chat-spinner" aria-hidden="true" /> Getting your answer...</div>
+                </>
               ) : chatState === "error" ? (
                 <div className="chat-error" role="alert">
                   <strong>We couldn’t get a response.</strong>
                   <p>{chatError || "Check the connection and try again."} Your question is still available above.</p>
                 </div>
-              ) : submittedQuestion ? (
+              ) : chatState === "answered" ? (
                 <>
-                  <p className="question-echo">“{submittedQuestion}”</p>
+                  <p className="question-echo"><strong>Question</strong> {submittedQuestion}</p>
                   <dl className="structured-answer">
-                    <div><dt>Answer</dt><dd>{chatState === "queued" ? "Waiting for the approved AI connection." : "A structured answer will appear here."}</dd></div>
-                    <div><dt>Supporting data</dt><dd>Metrics and evidence will appear here when connected.</dd></div>
-                    <div><dt>Applied filters</dt><dd>{Object.entries(filters).filter(([, value]) => value).map(([key, value]) => `${key}: ${value}`).join(" · ") || "None"}</dd></div>
+                    <div><dt>Answer</dt><dd>{chatAnswer}</dd></div>
                   </dl>
-                  <p className="response-message">Saved locally only; no AI request was sent.</p>
                 </>
               ) : (
-                <p className="helper-text">Your structured answer, supporting data, and applied filters will appear here.</p>
+                <p className="helper-text">Your question and its answer will appear here.</p>
               )}
             </section>
           </section>
         </div>
+
+        <section className="history-section" aria-labelledby="question-history-heading">
+          <div className="history-toolbar">
+            <div>
+              <p className="panel-kicker">Saved questions</p>
+              <h2 id="question-history-heading">Question history</h2>
+            </div>
+            <form className="history-search" onSubmit={handleQuestionSearch} role="search">
+              <input
+                type="search"
+                aria-label="Search saved questions"
+                placeholder="Search questions"
+                value={questionSearch}
+                onChange={(event) => setQuestionSearch(event.target.value)}
+              />
+              <button type="submit">Search</button>
+              <button className="history-clear" type="button" onClick={clearQuestionSearch} disabled={!questionSearch && !appliedQuestionSearch}>Clear</button>
+            </form>
+          </div>
+
+          {historyLoading ? (
+            <p className="history-status" role="status">Loading recent questions...</p>
+          ) : historyError ? (
+            <div className="error-banner" role="alert">
+              <span>{historyError}</span>
+              <button className="retry-button" type="button" onClick={() => setHistoryReloadKey((current) => current + 1)}>Retry</button>
+            </div>
+          ) : savedQuestions.length === 0 ? (
+            <div className="history-empty">
+              {appliedQuestionSearch ? "No saved questions match your search." : "No saved questions yet."}
+            </div>
+          ) : (
+            <>
+              <div className="history-list" aria-live="polite">
+                {savedQuestions.map((savedQuestion, index) => (
+                  <article className="history-item" key={savedQuestion.id ?? `${savedQuestion.created_at}-${index}`}>
+                    <p className="history-question">{savedQuestion.question}</p>
+                    <time className="history-time" dateTime={savedQuestion.created_at}>{formatQuestionTimestamp(savedQuestion.created_at)}</time>
+                  </article>
+                ))}
+              </div>
+              <div className="history-pagination">
+                <span className="record-count">
+                  {questionTotal === null
+                    ? `Showing ${questionOffset + 1}–${questionOffset + savedQuestions.length}`
+                    : `Showing ${questionOffset + 1}–${Math.min(questionOffset + savedQuestions.length, questionTotal)} of ${questionTotal}`}
+                </span>
+                <div>
+                  <button type="button" onClick={() => setQuestionOffset((current) => Math.max(0, current - QUESTION_PAGE_SIZE))} disabled={questionOffset === 0 || historyLoading}>Previous</button>
+                  <button type="button" onClick={() => setQuestionOffset((current) => current + QUESTION_PAGE_SIZE)} disabled={!hasMoreQuestions || historyLoading}>Next</button>
+                </div>
+              </div>
+            </>
+          )}
+        </section>
       </main>
     </div>
   );

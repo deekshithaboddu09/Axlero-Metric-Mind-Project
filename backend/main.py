@@ -1,5 +1,5 @@
 import os
-from datetime import date
+from datetime import date, datetime
 
 import psycopg
 from dotenv import load_dotenv
@@ -467,7 +467,7 @@ def create_question(payload: QuestionCreate):
 # GET SAVED QUESTIONS API
 # ============================================================
 
-@app.get("/questions", response_model=list[QuestionResponse])
+@app.get("/questions", response_model=QuestionHistoryResponse)
 def get_questions(
     search: str | None = Query(default=None),
     limit: int = Query(default=20, ge=1, le=100),
@@ -486,27 +486,70 @@ def get_questions(
                     )
                     """
                 )
-
-                cur.execute(
-                    """
-                    SELECT
-                        id,
-                        question
-                    FROM saved_questions
-                    ORDER BY created_at DESC, id DESC
-                    """
-                )
-
+                if search:
+                    cur.execute(
+                        """
+                        SELECT
+                            id,
+                            question,
+                            created_at
+                        FROM saved_questions
+                        WHERE question ILIKE %s
+                        ORDER BY created_at DESC, id DESC
+                        LIMIT %s OFFSET %s
+                        """,
+                        (f"%{search}%", limit, offset),
+                    )
+                else:
+                    cur.execute(
+                        """
+                        SELECT 
+                            id,
+                            question,
+                            created_at
+                        FROM saved_questions
+                        ORDER BY created_at DESC, id DESC
+                        LIMIT %s OFFSET %s
+                        """,
+                        (limit, offset),
+                    )
                 rows = cur.fetchall()
-                conn.commit()
 
-        return [
-            QuestionResponse(
-                id=row[0],
-                question=row[1],
+                if search:
+                    cur.execute(
+                        """
+                        SELECT COUNT(*)
+                        FROM saved_questions
+                        WHERE question ILIKE %s
+                        """,
+                        (f"%{search}%",),
+                    )
+                else:
+                    cur.execute(
+                        """
+                        SELECT COUNT(*)
+                        FROM saved_questions
+                        """
+                    )
+
+                total = cur.fetchone()[0]
+                conn.commit()
+        
+
+        return QuestionHistoryResponse(
+                total=total,
+                limit=limit,
+                offset=offset,
+                questions=[
+                    QuestionResponse(
+                        id=row[0],
+                        question=row[1],
+                        created_at=row[2],
+                    )
+                    for row in rows
+                ],
             )
-            for row in rows
-        ]
+           
 
     except Exception as exc:
         raise HTTPException(
@@ -519,10 +562,44 @@ def get_questions(
 # ASK METRICMIND - ANSWER QUESTION API
 # ============================================================
 
+def build_question_filters(conn, question_text):
+        filter_columns = {
+            "region": "region",
+            "country": "country",
+            "product_name": "product_name",
+            "category": "category",
+            "quarter": "quarter",
+        }
+
+        conditions = []
+        params = []
+
+        with conn.cursor() as cur:
+            for column, sql_column in filter_columns.items():
+                cur.execute(
+                    f"SELECT DISTINCT {sql_column} FROM fct_sales WHERE {sql_column} IS NOT NULL"
+                )
+                values = [row[0] for row in cur.fetchall()]
+
+                matches = [
+                    value
+                    for value in values
+                    if str(value).lower() in question_text
+                ]
+
+                if matches:
+                    # Use the longest match when values overlap.
+                    value = max(matches, key=lambda item: len(str(item)))
+                    conditions.append(f"{sql_column} = %s")
+                    params.append(value)
+
+        return conditions, params
+
 @app.post(
     "/questions/answer",
     response_model=QuestionAnswerResponse,
 )
+
 def answer_question(payload: QuestionCreate):
     question = payload.question.strip()
 
@@ -934,38 +1011,7 @@ def answer_question(payload: QuestionCreate):
     # TOTAL / FILTERED METRIC HELPERS
     # --------------------------------------------------------
 
-    def build_question_filters(conn, question_text):
-        filter_columns = {
-            "region": "region",
-            "country": "country",
-            "product_name": "product_name",
-            "category": "category",
-            "quarter": "quarter",
-        }
-
-        conditions = []
-        params = []
-
-        with conn.cursor() as cur:
-            for column, sql_column in filter_columns.items():
-                cur.execute(
-                    f"SELECT DISTINCT {sql_column} FROM fct_sales WHERE {sql_column} IS NOT NULL"
-                )
-                values = [row[0] for row in cur.fetchall()]
-
-                matches = [
-                    value
-                    for value in values
-                    if str(value).lower() in question_text
-                ]
-
-                if matches:
-                    # Use the longest match when values overlap.
-                    value = max(matches, key=lambda item: len(str(item)))
-                    conditions.append(f"{sql_column} = %s")
-                    params.append(value)
-
-        return conditions, params
+    
 
     # --------------------------------------------------------
     # FILTERED / TOTAL REVENUE

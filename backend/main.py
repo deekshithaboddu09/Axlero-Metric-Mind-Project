@@ -22,8 +22,10 @@ load_dotenv(ENV_FILE)
 # FASTAPI APP
 # ============================================================
 
-app = FastAPI(title="MetricMind Backend")
-
+app = FastAPI(
+    title = "MetricMind Backend",
+    version = "1.0.0",
+)
 
 # ============================================================
 # CORS

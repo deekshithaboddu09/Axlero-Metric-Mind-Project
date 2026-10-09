@@ -16,6 +16,14 @@ def test_health():
     assert response.status_code == 200
     assert response.json() == {"status": "healthy"}
 
+def test_api_version():
+    response = client.get("/openapi.json")
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert data["info"]["title"] == "MetricMind Backend"
+    assert data["info"]["version"] == "1.0.0"
 
 def test_sales():
     response = client.get("/sales")

@@ -224,8 +224,25 @@ def test_create_question():
     response = client.post(
         "/questions",
         json={
+            "question": "    "},
+    )
+
+    assert response.status_code == 422
+
+def test_create_question_too_long():
+    response = client.post(
+        "/questions",
+        json={"question": "a" * 501},
+    )
+
+    assert response.status_code == 422
+
+def test_create_question_success():
+    response = client.post(
+        "/questions",
+        json={
             "question": "Which quarter had the highest revenue?"
-        },
+        }
     )
 
     assert response.status_code == 200
@@ -619,3 +636,21 @@ def test_answer_question_unsupported():
     assert "currently answer questions" in data["answer"].lower()
     assert "total revenue" in data["answer"].lower()
     assert "filtered revenue" in data["answer"].lower()
+
+
+def test_answer_question_empty():
+    response = client.post(
+        "/questions/answer",
+        json={"question": "   "},
+    )
+
+    assert response.status_code == 422
+
+
+def test_answer_question_too_long():
+    response = client.post(
+        "/questions/answer",
+        json={"question": "a" * 501},
+    )
+
+    assert response.status_code == 422

@@ -5,7 +5,7 @@ import psycopg
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, ConfigDict
 
 
 # ============================================================
@@ -81,9 +81,13 @@ class CategorySummaryResponse(BaseModel):
     total_cost: float
     total_margin: float
 
-
 class QuestionCreate(BaseModel):
-    question: str
+    model_config = ConfigDict(str_strip_whitespace=True)
+    
+    question: str = Field(
+        min_length=1,
+        max_length=500,
+        )
 
 
 class QuestionResponse(BaseModel):
@@ -411,6 +415,46 @@ def get_category_summary(
             detail=f"Category summary request failed: {exc}",
         )
 
+# ============================================================
+# QUARTER SUMMARY API
+# ============================================================
+
+@app.get("/summary/quarter")
+def get_quarter_summary():
+    query = """
+        SELECT
+            quarter,
+            COUNT(*) AS total_orders,
+            COALESCE(SUM(revenue), 0) AS total_revenue,
+            COALESCE(SUM(total_cost), 0) AS total_cost,
+            COALESCE(SUM(margin), 0) AS total_margin
+        FROM fct_sales
+        GROUP BY quarter
+        ORDER BY quarter
+    """
+
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(query)
+                rows = cur.fetchall()
+
+        return [
+            {
+                "quarter": row[0],
+                "total_orders": int(row[1]),
+                "total_revenue": float(row[2]),
+                "total_cost": float(row[3]),
+                "total_margin": float(row[4]),
+            }
+            for row in rows
+        ]
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Quarter summary request failed: {exc}",
+        )
 
 # ============================================================
 # CREATE QUESTION API
@@ -612,6 +656,12 @@ def answer_question(payload: QuestionCreate):
         )
 
     question_lower = question.lower()
+    quarter_match = None
+
+    for quarter_name in ["Q1", "Q2", "Q3", "Q4"]:
+        if quarter_name.lower() in question_lower:
+            quarter_match = quarter_name
+            break
 
     # --------------------------------------------------------
     # HIGHEST QUARTERLY REVENUE
@@ -1029,6 +1079,12 @@ def answer_question(payload: QuestionCreate):
                     conn,
                     question_lower,
                 )
+                if quarter_match and not any(
+                    condition.startswith("quarter =")
+                    for condition in conditions
+                ):
+                    conditions.append("quarter = %s")
+                    params.append(quarter_match)
 
                 query = """
                     SELECT COALESCE(SUM(revenue), 0)

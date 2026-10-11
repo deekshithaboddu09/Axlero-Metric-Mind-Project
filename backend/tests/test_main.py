@@ -554,6 +554,7 @@ def test_answer_question_total_revenue_quarter():
         "What is the total revenue for Q2?"
     )
     assert "total revenue" in data["answer"].lower()
+    assert "q2" in data["answer"].lower()
     assert "1,484,038.25" in data["answer"]
 
 

@@ -4,6 +4,11 @@
 
 MetricMind backend is developed using FastAPI and connects to a PostgreSQL database. It provides APIs for application health checks, sales data, business summaries, and Ask MetricMind question answering.
 
+**API Version:** `1.0.0`
+
+**Backend test suite:** 43 tests configured.
+
+
 **Base URL:** `http://127.0.0.1:8000`
 
 **API testing:** `http://127.0.0.1:8000/docs`

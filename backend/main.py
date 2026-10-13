@@ -1063,7 +1063,62 @@ def answer_question(payload: QuestionCreate):
     # TOTAL / FILTERED METRIC HELPERS
     # --------------------------------------------------------
 
-    
+        # --------------------------------------------------------
+    # REVENUE BY QUARTER
+    # --------------------------------------------------------
+
+    if (
+        "revenue" in question_lower
+        and "quarter" in question_lower
+        and not quarter_match
+    ):
+        try:
+            with get_db_connection() as conn:
+                conditions, params = build_question_filters(
+                    conn,
+                    question_lower,
+                )
+
+                query = """
+                    SELECT
+                        quarter,
+                        COALESCE(SUM(revenue), 0) AS total_revenue
+                    FROM fct_sales
+                """
+
+                if conditions:
+                    query += " WHERE " + " AND ".join(conditions)
+
+                query += """
+                    GROUP BY quarter
+                    ORDER BY quarter
+                """
+
+                with conn.cursor() as cur:
+                    cur.execute(query, params)
+                    rows = cur.fetchall()
+
+            if not rows:
+                answer = "No sales data is available to answer this question."
+            else:
+                quarter_totals = [
+                    f"{row[0]}: ${float(row[1] or 0):,.2f}"
+                    for row in rows
+                ]
+                answer = "Total revenue by quarter: " + "; ".join(
+                    quarter_totals
+                ) + "."
+
+            return QuestionAnswerResponse(
+                question=question,
+                answer=answer,
+            )
+
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Question analysis failed: {exc}",
+            )
 
     # --------------------------------------------------------
     # FILTERED / TOTAL REVENUE

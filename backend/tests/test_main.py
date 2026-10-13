@@ -538,6 +538,28 @@ def test_answer_question_total_margin_category():
     assert "1,991,304.02" in data["answer"]
 
 
+def test_answer_question_revenue_by_quarter():
+    response = client.post(
+        "/questions/answer",
+        json={
+            "question": "What is the total revenue by quarter?"
+        },
+    )
+
+    assert response.status_code == 200
+
+    answer = response.json()["answer"]
+
+    assert "Q1" in answer
+    assert "1,389,392.57" in answer
+    assert "Q2" in answer
+    assert "1,484,038.25" in answer
+    assert "Q3" in answer
+    assert "1,464,768.02" in answer
+    assert "Q4" in answer
+    assert "1,382,331.77" in answer
+
+
 def test_answer_question_total_revenue_quarter():
     response = client.post(
         "/questions/answer",
@@ -546,6 +568,7 @@ def test_answer_question_total_revenue_quarter():
         },
     )
 
+    
     assert response.status_code == 200
 
     data = response.json()

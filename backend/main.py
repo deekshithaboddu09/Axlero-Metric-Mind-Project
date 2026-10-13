@@ -1100,7 +1100,9 @@ def answer_question(payload: QuestionCreate):
 
             revenue = float(row[0] or 0)
 
-            if conditions:
+            if quarter_match:
+                answer = f"Total revenue for {quarter_match} is ${revenue:,.2f}."
+            elif conditions:
                 answer = f"The total revenue for the requested filters is ${revenue:,.2f}."
             else:
                 answer = f"Total revenue is ${revenue:,.2f}."

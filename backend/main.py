@@ -81,6 +81,17 @@ class CategorySummaryResponse(BaseModel):
     total_cost: float
     total_margin: float
 
+
+class FilterOptionsResponse(BaseModel):
+    regions: list[str]
+    countries: list[str]
+    products: list[str]
+    categories: list[str]
+    quarters: list[str]
+    min_date: date | None
+    max_date: date | None
+
+
 class QuestionCreate(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True)
     
@@ -183,9 +194,17 @@ def get_sales(
     product_name: str | None = Query(default=None),
     category: str | None = Query(default=None),
     quarter: str | None = Query(default=None),
+    start_date: date | None = Query(default=None),
+    end_date: date | None = Query(default=None),
     limit: int = Query(default=20, ge=1, le=1000),
     offset: int = Query(default=0, ge=0),
 ):
+    if start_date and end_date and start_date > end_date:
+        raise HTTPException(
+            status_code=400,
+            detail="start_date must be on or before end_date.",
+        )
+
     query = """
         SELECT
             order_id,
@@ -229,6 +248,14 @@ def get_sales(
     if quarter:
         query += " AND quarter = %s"
         params.append(quarter)
+
+    if start_date:
+        query += " AND order_date >= %s"
+        params.append(start_date)
+
+    if end_date:
+        query += " AND order_date <= %s"
+        params.append(end_date)
 
     query += """
         ORDER BY order_date, order_id
@@ -284,7 +311,15 @@ def get_summary(
     product_name: str | None = Query(default=None),
     category: str | None = Query(default=None),
     quarter: str | None = Query(default=None),
+    start_date: date | None = Query(default=None),
+    end_date: date | None = Query(default=None),
 ):
+    if start_date and end_date and start_date > end_date:
+        raise HTTPException(
+            status_code=400,
+            detail="start_date must be on or before end_date.",
+        )
+
     query = """
         SELECT
             COUNT(*) AS total_orders,
@@ -316,6 +351,14 @@ def get_summary(
     if quarter:
         query += " AND quarter = %s"
         params.append(quarter)
+
+    if start_date:
+        query += " AND order_date >= %s"
+        params.append(start_date)
+
+    if end_date:
+        query += " AND order_date <= %s"
+        params.append(end_date)
 
     try:
         with get_db_connection() as conn:
@@ -455,6 +498,65 @@ def get_quarter_summary():
             status_code=500,
             detail=f"Quarter summary request failed: {exc}",
         )
+
+
+# ============================================================
+# FILTER OPTIONS API
+# ============================================================
+
+@app.get("/filters/options", response_model=FilterOptionsResponse)
+def get_filter_options():
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT DISTINCT region FROM fct_sales WHERE region IS NOT NULL ORDER BY region"
+                )
+                regions = [row[0] for row in cur.fetchall()]
+
+                cur.execute(
+                    "SELECT DISTINCT country FROM fct_sales WHERE country IS NOT NULL ORDER BY country"
+                )
+                countries = [row[0] for row in cur.fetchall()]
+
+                cur.execute(
+                    "SELECT DISTINCT product_name FROM fct_sales WHERE product_name IS NOT NULL ORDER BY product_name"
+                )
+                products = [row[0] for row in cur.fetchall()]
+
+                cur.execute(
+                    "SELECT DISTINCT category FROM fct_sales WHERE category IS NOT NULL ORDER BY category"
+                )
+                categories = [row[0] for row in cur.fetchall()]
+
+                cur.execute(
+                    "SELECT DISTINCT quarter FROM fct_sales WHERE quarter IS NOT NULL ORDER BY quarter"
+                )
+                quarters = [row[0] for row in cur.fetchall()]
+
+                cur.execute(
+                    "SELECT MIN(order_date), MAX(order_date) FROM fct_sales"
+                )
+                min_max_row = cur.fetchone()
+                min_date = min_max_row[0] if min_max_row else None
+                max_date = min_max_row[1] if min_max_row else None
+
+        return FilterOptionsResponse(
+            regions=regions,
+            countries=countries,
+            products=products,
+            categories=categories,
+            quarters=quarters,
+            min_date=min_date,
+            max_date=max_date,
+        )
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Filter options request failed: {exc}",
+        )
+
 
 # ============================================================
 # CREATE QUESTION API

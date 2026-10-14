@@ -217,6 +217,182 @@ def test_sales_pagination_offset():
 
 
 # ============================================================
+# DATE FILTER TESTS
+# ============================================================
+
+def test_sales_and_summary_start_date_only():
+    response = client.get("/sales?start_date=2025-07-01")
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert len(data) > 0
+
+    for record in data:
+        assert record["order_date"] >= "2025-07-01"
+
+    summary_response = client.get("/summary?start_date=2025-07-01")
+    assert summary_response.status_code == 200
+    summary_data = summary_response.json()
+    assert summary_data["total_orders"] > 0
+    assert summary_data["total_revenue"] > 0
+
+
+def test_sales_and_summary_end_date_only():
+    response = client.get("/sales?end_date=2025-06-30")
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert len(data) > 0
+
+    for record in data:
+        assert record["order_date"] <= "2025-06-30"
+
+    summary_response = client.get("/summary?end_date=2025-06-30")
+    assert summary_response.status_code == 200
+    summary_data = summary_response.json()
+    assert summary_data["total_orders"] > 0
+    assert summary_data["total_revenue"] > 0
+
+
+def test_sales_and_summary_both_dates():
+    response = client.get(
+        "/sales?start_date=2025-04-01&end_date=2025-06-30"
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert len(data) > 0
+
+    for record in data:
+        assert "2025-04-01" <= record["order_date"] <= "2025-06-30"
+
+    summary_response = client.get(
+        "/summary?start_date=2025-04-01&end_date=2025-06-30"
+    )
+    assert summary_response.status_code == 200
+    summary_data = summary_response.json()
+    assert summary_data["total_orders"] > 0
+    assert summary_data["total_revenue"] > 0
+
+
+def test_invalid_date_range():
+    sales_response = client.get(
+        "/sales?start_date=2025-12-31&end_date=2025-01-01"
+    )
+
+    assert sales_response.status_code == 400
+    assert (
+        sales_response.json()["detail"]
+        == "start_date must be on or before end_date."
+    )
+
+    summary_response = client.get(
+        "/summary?start_date=2025-12-31&end_date=2025-01-01"
+    )
+
+    assert summary_response.status_code == 400
+    assert (
+        summary_response.json()["detail"]
+        == "start_date must be on or before end_date."
+    )
+
+
+def test_date_filter_without_quarter():
+    # Verify start_date filters correctly without specifying quarter
+    response = client.get("/sales?start_date=2025-10-01")
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert len(data) > 0
+
+    for record in data:
+        assert record["order_date"] >= "2025-10-01"
+        assert record["quarter"].upper() == "Q4"
+
+    # Verify both dates without quarter parameter
+    range_response = client.get(
+        "/sales?start_date=2025-01-01&end_date=2025-03-31"
+    )
+
+    assert range_response.status_code == 200
+
+    range_data = range_response.json()
+
+    assert len(range_data) > 0
+
+    for record in range_data:
+        assert record["order_date"] <= "2025-03-31"
+        assert record["quarter"].upper() == "Q1"
+
+
+# ============================================================
+# FILTER OPTIONS API TESTS
+# ============================================================
+
+def test_filter_options_structure():
+    response = client.get("/filters/options")
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert "regions" in data
+    assert "countries" in data
+    assert "products" in data
+    assert "categories" in data
+    assert "quarters" in data
+    assert "min_date" in data
+    assert "max_date" in data
+
+    assert isinstance(data["regions"], list)
+    assert isinstance(data["countries"], list)
+    assert isinstance(data["products"], list)
+    assert isinstance(data["categories"], list)
+    assert isinstance(data["quarters"], list)
+
+    assert len(data["regions"]) > 0
+    assert len(data["countries"]) > 0
+    assert len(data["products"]) > 0
+    assert len(data["categories"]) > 0
+    assert len(data["quarters"]) > 0
+
+    # Verify lists are sorted
+    assert data["regions"] == sorted(data["regions"])
+    assert data["countries"] == sorted(data["countries"])
+    assert data["products"] == sorted(data["products"])
+    assert data["categories"] == sorted(data["categories"])
+    assert data["quarters"] == sorted(data["quarters"])
+
+
+def test_filter_options_values_and_date_boundaries():
+    response = client.get("/filters/options")
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    # Verify presence of expected core domain entities
+    assert "Europe" in data["regions"]
+    assert "Germany" in data["countries"]
+    assert "Software" in data["categories"]
+    assert "Analytics Suite" in data["products"]
+    assert set(["Q1", "Q2", "Q3", "Q4"]).issubset(set(data["quarters"]))
+
+    # Verify date boundaries are present and valid
+    assert data["min_date"] is not None
+    assert data["max_date"] is not None
+    assert data["min_date"] <= data["max_date"]
+
+
+# ============================================================
 # QUESTION API TESTS
 # ============================================================
 

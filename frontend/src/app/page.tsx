@@ -30,6 +30,16 @@ type Filters = {
   quarter: string;
 };
 
+type FilterOptions = {
+  regions: string[];
+  countries: string[];
+  products: string[];
+  categories: string[];
+  quarters: string[];
+  min_date: string | null;
+  max_date: string | null;
+};
+
 type QuestionAnswer = {
   question: string;
   answer: string;
@@ -42,28 +52,33 @@ const initialSummary: Summary = {
   total_margin: 0,
 };
 
+const initialFilterOptions: FilterOptions = {
+  regions: [],
+  countries: [],
+  products: [],
+  categories: [],
+  quarters: [],
+  min_date: null,
+  max_date: null,
+};
+
 const filterDefinitions: {
   key: keyof Filters;
   label: string;
-  examples: string[];
 }[] = [
-  { key: "region", label: "Region", examples: ["Europe"] },
-  { key: "country", label: "Country", examples: ["Germany"] },
-  {
-    key: "product_name",
-    label: "Product",
-    examples: ["Analytics Suite"],
-  },
-  {
-    key: "category",
-    label: "Category",
-    examples: ["Software"],
-  },
-  {
-    key: "quarter",
-    label: "Quarter",
-    examples: ["Q1", "Q2", "Q3", "Q4"],
-  },
+  { key: "region", label: "Region" },
+  { key: "country", label: "Country" },
+  { key: "product_name", label: "Product" },
+  { key: "category", label: "Category" },
+  { key: "quarter", label: "Quarter" },
+];
+
+const suggestedQuestions = [
+  "Which quarter had the highest revenue?",
+  "Which country generated the most revenue?",
+  "Which product has the highest margin?",
+  "What is the total revenue for Europe?",
+  "Which category generated the highest revenue?",
 ];
 
 function formatNumber(value: number | string | undefined) {
@@ -113,6 +128,65 @@ export default function Home() {
   const [summary, setSummary] = useState<Summary>(initialSummary);
   const [sales, setSales] = useState<Sale[]>([]);
 
+function exportSalesToCSV() {
+  if (sales.length === 0) {
+    return;
+  }
+
+  const headers = [
+    "Order ID",
+    "Order Date",
+    "Country",
+    "Region",
+    "Product",
+    "Category",
+    "Revenue",
+    "Cost",
+    "Margin",
+    "Quarter",
+  ];
+
+  const rows = sales.map((sale) => [
+    sale.order_id ?? "",
+    sale.order_date ?? "",
+    sale.country ?? "",
+    sale.region ?? "",
+    sale.product_name ?? "",
+    sale.category ?? "",
+    sale.revenue ?? "",
+    sale.total_cost ?? "",
+    sale.margin ?? "",
+    sale.quarter ?? "",
+  ]);
+
+  const escapeCSV = (value: string | number) =>
+    `"${String(value).replace(/"/g, '""')}"`;
+
+  const csvContent = [
+    headers,
+    ...rows,
+  ]
+    .map((row) => row.map(escapeCSV).join(","))
+    .join("\r\n");
+
+  const blob = new Blob(
+    ["\uFEFF", csvContent],
+    { type: "text/csv;charset=utf-8;" }
+  );
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "metricmind_sales.csv";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
   const [filters, setFilters] = useState<Filters>({
     region: "",
     country: "",
@@ -120,6 +194,33 @@ export default function Home() {
     category: "",
     quarter: "",
   });
+
+  const [filterOptions, setFilterOptions] =
+    useState<FilterOptions>(initialFilterOptions);
+  const [filterOptionsLoading, setFilterOptionsLoading] = useState(true);
+  const [filterOptionsError, setFilterOptionsError] = useState("");
+
+  const clearFilters = () => {
+    setFilters({
+      region: "",
+      country: "",
+      product_name: "",
+      category: "",
+      quarter: "",
+    });
+    setStartDate("");
+    setEndDate("");
+  };
+
+  const hasActiveFilters =
+    Object.values(filters).some(Boolean) ||
+    Boolean(startDate) ||
+    Boolean(endDate);
+
+  const activeFiltersCount =
+    Object.values(filters).filter(Boolean).length +
+    (startDate ? 1 : 0) +
+    (endDate ? 1 : 0);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -171,6 +272,48 @@ export default function Home() {
   useEffect(() => {
     const controller = new AbortController();
 
+    async function loadFilterOptions() {
+      setFilterOptionsLoading(true);
+      setFilterOptionsError("");
+
+      try {
+        const response = await fetch("/backend/filters/options", {
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `Filter options request failed (${response.status}).`
+          );
+        }
+
+        const data: FilterOptions = await response.json();
+        setFilterOptions(data);
+      } catch (err) {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setFilterOptionsError(
+          err instanceof Error
+            ? err.message
+            : "Unable to load filter options."
+        );
+      } finally {
+        if (!controller.signal.aborted) {
+          setFilterOptionsLoading(false);
+        }
+      }
+    }
+
+    void loadFilterOptions();
+
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
     const params = new URLSearchParams();
 
     Object.entries(filters).forEach(([key, value]) => {
@@ -178,6 +321,13 @@ export default function Home() {
         params.set(key, value);
       }
     });
+    if (startDate) {
+      params.set("start_date", startDate);
+    }
+
+    if (endDate) {
+      params.set("end_date", endDate);
+    }
 
     const query = params.size
       ? `?${params.toString()}`
@@ -215,14 +365,23 @@ export default function Home() {
     void loadDashboard();
 
     return () => controller.abort();
-  }, [filters]);
+  }, [filters, startDate, endDate]);
 
-  async function handleSubmit(
-    event: FormEvent<HTMLFormElement>
-  ) {
-    event.preventDefault();
+  const [pageSize, setPageSize] = useState<number>(25);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
-    const trimmedQuestion = question.trim();
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters, startDate, endDate]);
+
+  const totalPages = Math.max(1, Math.ceil(sales.length / pageSize));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const startIndex = (safeCurrentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, sales.length);
+  const paginatedSales = sales.slice(startIndex, endIndex);
+
+  async function executeQuestion(targetQuestion: string) {
+    const trimmedQuestion = targetQuestion.trim();
 
     if (!trimmedQuestion || questionSaving) {
       return;
@@ -341,6 +500,13 @@ export default function Home() {
     }
   }
 
+  async function handleSubmit(
+    event: FormEvent<HTMLFormElement>
+  ) {
+    event.preventDefault();
+    await executeQuestion(question);
+  }
+
   function updateFilter(
     key: keyof Filters,
     value: string
@@ -375,10 +541,20 @@ export default function Home() {
     0
   );
 
-  function optionsFor(
-    key: keyof Filters,
-    examples: string[]
-  ) {
+  function optionsFor(key: keyof Filters) {
+    const optionListByKey: Record<keyof Filters, string[]> = {
+      region: filterOptions.regions,
+      country: filterOptions.countries,
+      product_name: filterOptions.products,
+      category: filterOptions.categories,
+      quarter: filterOptions.quarters,
+    };
+
+    const backendOptions = optionListByKey[key] ?? [];
+    if (backendOptions.length > 0) {
+      return backendOptions;
+    }
+
     const valueByKey: Record<
       keyof Filters,
       keyof Sale
@@ -398,12 +574,7 @@ export default function Home() {
           value.length > 0
       );
 
-    return [
-      ...new Set([
-        ...examples,
-        ...values,
-      ]),
-    ].sort((left, right) =>
+    return [...new Set(values)].sort((left, right) =>
       left.localeCompare(right)
     );
   }
@@ -432,7 +603,11 @@ export default function Home() {
 
         <span
           className={`status-pill ${
-            error ? "status-error" : ""
+            loading
+              ? "status-loading"
+              : error
+                ? "status-error"
+                : ""
           }`}
         >
           <span className="status-dot" />
@@ -475,28 +650,25 @@ export default function Home() {
         >
           <div className="filter-heading">
             <div>
-              <p className="panel-kicker">
-                Refine results
-              </p>
-
+              <p className="panel-kicker">Refine results</p>
               <h2>Filters</h2>
             </div>
 
+            {hasActiveFilters && (
+              <span className="record-count">
+                {activeFiltersCount}{" "}
+                {activeFiltersCount === 1
+                  ? "filter"
+                  : "filters"}{" "}
+                applied
+              </span>
+            )}
+
             <button
               className="clear-button"
+              onClick={clearFilters}
               type="button"
-              onClick={() =>
-                setFilters({
-                  region: "",
-                  country: "",
-                  product_name: "",
-                  category: "",
-                  quarter: "",
-                })
-              }
-              disabled={
-                !Object.values(filters).some(Boolean)
-              }
+              disabled={!hasActiveFilters}
             >
               Clear all
             </button>
@@ -504,11 +676,7 @@ export default function Home() {
 
           <div className="filter-controls">
             {filterDefinitions.map(
-              ({
-                key,
-                label,
-                examples,
-              }) => (
+              ({ key, label }) => (
                 <label
                   className="filter-control"
                   htmlFor={`filter-${key}`}
@@ -519,11 +687,9 @@ export default function Home() {
                   <select
                     id={`filter-${key}`}
                     value={filters[key]}
+                    disabled={filterOptionsLoading && optionsFor(key).length === 0}
                     onChange={(event) =>
-                      updateFilter(
-                        key,
-                        event.target.value
-                      )
+                      updateFilter(key, event.target.value)
                     }
                   >
                     <option value="">
@@ -535,14 +701,8 @@ export default function Home() {
                           : `${label.toLowerCase()}s`}
                     </option>
 
-                    {optionsFor(
-                      key,
-                      examples
-                    ).map((option) => (
-                      <option
-                        key={option}
-                        value={option}
-                      >
+                    {optionsFor(key).map((option) => (
+                      <option key={option} value={option}>
                         {option}
                       </option>
                     ))}
@@ -550,6 +710,36 @@ export default function Home() {
                 </label>
               )
             )}
+
+            <label
+              className="filter-control date-filter-control"
+              htmlFor="filter-start-date"
+            >
+              <span>Start Date</span>
+              <input
+                id="filter-start-date"
+                type="date"
+                value={startDate}
+                min={filterOptions.min_date || undefined}
+                max={endDate || filterOptions.max_date || undefined}
+                onChange={(event) => setStartDate(event.target.value)}
+              />
+            </label>
+
+            <label
+              className="filter-control date-filter-control"
+              htmlFor="filter-end-date"
+            >
+              <span>End Date</span>
+              <input
+                id="filter-end-date"
+                type="date"
+                value={endDate}
+                min={startDate || filterOptions.min_date || undefined}
+                max={filterOptions.max_date || undefined}
+                onChange={(event) => setEndDate(event.target.value)}
+              />
+            </label>
           </div>
         </section>
 
@@ -643,11 +833,23 @@ export default function Home() {
               <h2>Recent sales</h2>
             </div>
 
-            <span className="record-count">
-              {loading
-                ? "Loading records"
-                : `${sales.length} records`}
-            </span>
+            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+              <button
+                type="button"
+                className="clear-button"
+                onClick={exportSalesToCSV}
+                disabled={loading || sales.length === 0}
+                title="Download all sales records matching current filters"
+              >
+                Export CSV ({sales.length})
+              </button>
+
+              <span className="record-count">
+                {loading
+                  ? "Loading records"
+                  : `${sales.length} ${sales.length === 1 ? "record" : "records"} found`}
+              </span>
+            </div>
           </div>
 
           <div className="table-wrap">
@@ -668,13 +870,13 @@ export default function Home() {
               </thead>
 
               <tbody>
-                {sales.map(
+                {paginatedSales.map(
                   (sale, index) => (
                     <tr
                       key={`${
                         sale.order_id ??
                         "order"
-                      }-${index}`}
+                      }-${startIndex + index}`}
                     >
                       <td>
                         {sale.order_id ?? "-"}
@@ -741,6 +943,61 @@ export default function Home() {
                   )}
               </tbody>
             </table>
+
+            {!loading && sales.length > 0 && (
+              <div className="pagination-bar">
+                <div className="pagination-left">
+                  <span>
+                    Showing {startIndex + 1}–{endIndex} of {sales.length} records
+                  </span>
+
+                  <label className="pagination-page-size">
+                    <span>Rows per page:</span>
+                    <select
+                      value={pageSize}
+                      onChange={(e) => {
+                        setPageSize(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                    >
+                      <option value={15}>15</option>
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div className="pagination-controls">
+                  <button
+                    type="button"
+                    className="pagination-btn"
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(1, prev - 1))
+                    }
+                    disabled={safeCurrentPage <= 1}
+                  >
+                    Previous
+                  </button>
+
+                  <span className="pagination-page-info">
+                    Page {safeCurrentPage} of {totalPages}
+                  </span>
+
+                  <button
+                    type="button"
+                    className="pagination-btn"
+                    onClick={() =>
+                      setCurrentPage((prev) =>
+                        Math.min(totalPages, prev + 1)
+                      )
+                    }
+                    disabled={safeCurrentPage >= totalPages}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </section>
 
@@ -821,9 +1078,7 @@ export default function Home() {
             {!loading &&
               sales.length === 0 && (
                 <p className="chart-status">
-                  Quarter values will appear
-                  when sales records are
-                  available.
+                  Quarter values will appear when sales records are available.
                 </p>
               )}
           </section>
@@ -843,6 +1098,26 @@ export default function Home() {
               <span className="coming-soon">
                 AI
               </span>
+            </div>
+
+            <div className="suggested-questions">
+              <span className="suggested-label">Suggested questions</span>
+              <div className="suggestion-chips">
+                {suggestedQuestions.map((promptText) => (
+                  <button
+                    key={promptText}
+                    type="button"
+                    className="suggestion-chip"
+                    onClick={() => {
+                      setQuestion(promptText);
+                      void executeQuestion(promptText);
+                    }}
+                    disabled={questionSaving}
+                  >
+                    {promptText}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <form

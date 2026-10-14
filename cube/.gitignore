@@ -1,0 +1,5 @@
+node_modules/
+.cube/
+.env
+.env.local
+npm-debug.log*

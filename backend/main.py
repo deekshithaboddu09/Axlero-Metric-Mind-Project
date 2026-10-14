@@ -1,11 +1,14 @@
 import os
 from datetime import date, datetime
+from typing import Any, Optional
 
 import psycopg
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, ConfigDict
+
+from backend.ai_agent import MetricMindAgent, CubeClient
 
 
 # ============================================================
@@ -115,6 +118,8 @@ class QuestionHistoryResponse(BaseModel):
 class QuestionAnswerResponse(BaseModel):
     question: str
     answer: str
+    source: Optional[str] = "deterministic_fallback"
+    query: Optional[dict[str, Any]] = None
 
 
 # ============================================================
@@ -743,20 +748,7 @@ def build_question_filters(conn, question_text):
 
         return conditions, params
 
-@app.post(
-    "/questions/answer",
-    response_model=QuestionAnswerResponse,
-)
-
-def answer_question(payload: QuestionCreate):
-    question = payload.question.strip()
-
-    if not question:
-        raise HTTPException(
-            status_code=400,
-            detail="Question cannot be empty",
-        )
-
+def deterministic_answer_question(question: str) -> QuestionAnswerResponse:
     question_lower = question.lower()
     quarter_match = None
 
@@ -1381,3 +1373,64 @@ def answer_question(payload: QuestionCreate):
             "or order questions."
         ),
     )
+
+
+# ============================================================
+# CUBE HEALTH CHECK API
+# ============================================================
+
+@app.get("/cube-health")
+def cube_health():
+    client = CubeClient()
+    healthy = client.health_check()
+    return {
+        "status": "ok" if healthy else "unavailable",
+        "cube_connected": healthy,
+    }
+
+
+# ============================================================
+# ASK METRICMIND - ANSWER QUESTION API (AI AGENT + FALLBACK)
+# ============================================================
+
+@app.post(
+    "/questions/answer",
+    response_model=QuestionAnswerResponse,
+)
+def answer_question(payload: QuestionCreate):
+    question = payload.question.strip()
+
+    if not question:
+        raise HTTPException(
+            status_code=400,
+            detail="Question cannot be empty",
+        )
+
+    # 1. Check for injected or configured AI Agent
+    agent: Optional[MetricMindAgent] = getattr(app.state, "ai_agent", None)
+    if agent is None:
+        gemini_api_key = os.getenv("GEMINI_API_KEY")
+        if gemini_api_key:
+            try:
+                agent = MetricMindAgent(api_key=gemini_api_key)
+            except Exception as exc:
+                print(f"[Ask MetricMind] Failed to initialize MetricMindAgent: {exc}")
+
+    # 2. Attempt AI Agent -> Cube pipeline if agent is available
+    if agent is not None:
+        try:
+            result = agent.answer_question(question)
+            return QuestionAnswerResponse(
+                question=result["question"],
+                answer=result["answer"],
+                source="ai_agent",
+                query=result.get("query"),
+            )
+        except Exception as exc:
+            print(
+                f"[Ask MetricMind] AI Agent query pipeline failed ({exc}); "
+                f"using controlled deterministic fallback."
+            )
+
+    # 3. Controlled deterministic fallback
+    return deterministic_answer_question(question)

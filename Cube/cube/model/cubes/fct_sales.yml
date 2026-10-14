@@ -56,3 +56,21 @@ cubes:
       - name: total_quantity
         sql: quantity
         type: sum
+        views:
+  - name: sales
+    cubes:
+      - join_path: fct_sales
+        includes:
+          - order_date
+          - quarter
+          - country
+          - region
+          - product_id
+          - product_name
+          - category
+          - customer_id
+          - total_orders
+          - total_revenue
+          - total_cost
+          - total_margin
+          - total_quantity

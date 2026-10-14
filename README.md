@@ -1,72 +1,220 @@
-# Axlero-Metric-Mind-Project
-Agentic Semantic BI Engine - Axlero Internship Project 
-             
-               SQL Commands - Complete Notes
+# MetricMind — Agentic Semantic BI Engine
 
-Created by: SIKILI AVINASH
+An AI-powered Business Intelligence platform that helps users explore sales data, understand business performance, and get answers to business questions through a conversational dashboard. Built as part of the Axlero internship project.
 
-SQL Commands
+## 1. The Problem
 
-SQL commands are instructions. It is used to communicate with the database. It is also used to perform specific tasks, functions, and queries of data.
+Businesses collect large amounts of sales data, but understanding that data often requires SQL knowledge, manual analysis, and multiple dashboard filters.
 
-SQL can perform various tasks like create a table, add data to tables, drop the table, modify the table, set permission for users.
+Users may want to ask simple questions like:
+- What is our total revenue?
+- Which country has the highest sales?
+- Which quarter generated the most revenue?
+- What are our total costs and profit margins?
 
-Types of SQL Commands
+MetricMind aims to make this information easier to access through a dashboard and natural-language questions.
 
-There are five types of SQL commands: DDL, DML, DCL, TCL, and DQL.
+## 2. Our Solution — How It Works
 
-1. Data Definition Language (DDL)
+1. Sales data is stored in a PostgreSQL database.
+2. Data transformation models organize the data for analysis using dbt.
+3. Cube provides a semantic layer with approved business metrics and dimensions.
+4. The FastAPI backend processes dashboard requests and questions.
+5. The AI agent helps interpret supported business questions and creates validated queries.
+6. The Next.js dashboard displays KPIs, charts, filtered sales data, and answers.
 
-DDL changes the structure of the table like creating a table, deleting a table, altering a table, etc.
+The goal is to connect users to trusted business metrics without requiring them to write SQL manually.
 
-All the command of DDL are auto-committed that means it permanently save all the changes in the database.
+## 3. Key Features
 
-Here are some commands that come under DDL:
+| Feature | Description |
+|---|---|
+| Business Dashboard | View important sales performance information |
+| KPI Cards | Display total orders, revenue, cost, and margin |
+| Interactive Filters | Filter data by region, country, product, category, and quarter |
+| Date Filters | Select a start date and end date |
+| Ask MetricMind | Ask business questions in natural language |
+| Semantic Layer | Use approved business metrics through Cube |
+| Sales Table | Explore filtered sales records |
+| Quarterly Analysis | Compare revenue across quarters |
+| Pagination | Browse sales records in manageable pages |
+| CSV Export | Export the filtered sales data |
+| Backend APIs | Provide data and answers to the frontend |
+| Automated Tests | Verify backend functionality and query validation |
 
-CREATE o  ALTER o  DROP o  TRUNCATE
+## 4. Architecture
 
-a. CREATE It is used to create a new table in the database.
+```text
+             User
+              |
+              v
+      Next.js Dashboard
+              |
+              v
+        FastAPI Backend
+              |
+              v
+         AI Agent
+              |
+              v
+       Query Validation
+              |
+              v
+       Cube Semantic Layer
+              |
+              v
+       PostgreSQL Database
 
-Syntax:
+       dbt Data Models
+       organize and
+       transform data
+```
 
-1.  CREATE TABLE TABLE_NAME (COLUMN_NAME DATATYPES[,....]);
+The AI query flow validates supported metrics and dimensions before sending queries to Cube. A deterministic fallback is available when the AI service is unavailable or not configured.
 
-Example:
+## 5. Technology Stack
 
-1.  CREATE TABLE EMPLOYEE(Name VARCHAR2(20), Email VARCHAR2(100), DOB DATE);
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js, React, TypeScript |
+| Backend | Python, FastAPI |
+| Database | PostgreSQL |
+| Semantic Layer | Cube |
+| Data Transformation | dbt |
+| AI Integration | Gemini API |
+| Testing | Pytest |
+| Version Control | Git and GitHub |
 
-b. DROP: It is used to delete both the structure and record stored in the table. Syntax
+## 6. Project Structure
 
-1.  DROP TABLE ;
+```text
+Axlero-Metric-Mind-Project/
+├── backend/
+│   ├── ai_agent/
+│   ├── tests/
+│   ├── main.py
+│   └── cube_client.py
+├── cube/
+│   ├── model/
+│   │   └── cubes/
+│   │       └── Sales.js
+│   └── docker-compose.yml
+├── data/
+│   └── raw/
+├── dbt/
+│   └── metricmind_dbt/
+├── docs/
+└── frontend/
+    └── src/
+        └── app/
+```
 
-Example
+## 7. Running the Project
 
-1.  DROP TABLE EMPLOYEE;
+### Prerequisites
 
-c. ALTER: It is used to alter the structure of the database. This change could be either to modify the characteristics of an existing attribute or probably to add a new attribute.
+- Python 3.13
+- Node.js and npm
+- PostgreSQL
+- Docker Desktop
+- Git
 
-Syntax:
+### Step 1 — Start the Backend
 
-To add a new column in the table
+Open a terminal at the project root:
 
-1.  ALTER TABLE table_name ADD column_name COLUMN-definition;
+```powershell
+.\backend\venv\Scripts\activate
+py -m uvicorn backend.main:app --reload
+```
 
-To modify existing column in the table:
+Backend API documentation:
 
-1.  ALTER TABLE MODIFY(COLUMN DEFINITION....);
+http://127.0.0.1:8000/docs
 
-EXAMPLE
+### Step 2 — Start Cube
 
-ALTER TABLE STU_DETAILS ADD(ADDRESS VARCHAR2(20));
+Configure the required database environment variables and start the Cube service using the project's Docker Compose configuration.
 
-ALTER TABLE STU_DETAILS MODIFY (NAME VARCHAR2(20));
+From the project root:
 
-d. TRUNCATE: It is used to delete all the rows from the table and free the space containing the table.
+```powershell
+cd cube
+docker compose up -d
+```
 
-Syntax:
+Cube API:
 
-1.  TRUNCATE TABLE table_name;
+http://localhost:4000
 
-Example:
+### Step 3 — Start the Frontend
 
-TRUNCATE TABLE EMPLOYEE;
+Open another terminal:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Open the local URL shown in the terminal, usually:
+
+http://localhost:3000
+
+Make sure PostgreSQL, Cube, and the backend are running before testing the complete application.
+
+## 8. Backend API Overview
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/` | Check the root endpoint |
+| GET | `/health` | Check backend health |
+| GET | `/db-health` | Check database connectivity |
+| GET | `/sales` | Retrieve sales records with supported filters and pagination |
+| GET | `/summary` | Retrieve sales summary information |
+| GET | `/summary/quarter` | Retrieve quarterly revenue information |
+| GET | `/filters/options` | Retrieve available filter options |
+| POST | `/questions/answer` | Answer a supported business question |
+| POST | `/questions` | Save a question |
+
+Open `/docs` on the running backend for the current API schemas and parameters.
+
+## 9. Testing
+
+The project includes automated backend tests for APIs, filters, pagination, AI query validation, and Cube integration.
+
+Run the backend tests from the project root:
+
+```powershell
+$env:PYTHONPATH="."
+.\backend\venv\Scripts\pytest backend\tests -v
+```
+
+Build the frontend:
+
+```powershell
+cd frontend
+npm run build
+```
+
+## 10. Team
+
+| Team Member | Responsibility |
+|---|---|
+| Boddu Deekshitha | Backend development and integration |
+| Sikili Avinash | Data preparation and data engineering |
+| Atul Bhosale | Semantic layer and AI-related work |
+| Pranjal Patil | Frontend development |
+
+## 11. Future Improvements
+
+- Improve AI response reliability and handling of unavailable AI services.
+- Expand business question coverage.
+- Improve dashboard visualizations and analytics.
+- Add more data quality checks.
+- Strengthen deployment and production configuration.
+- Improve end-to-end testing.
+
+## 12. Project Goal
+
+MetricMind aims to make business intelligence easier to use by connecting a conversational interface with validated business metrics, a semantic layer, and a structured sales database.

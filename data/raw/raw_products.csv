@@ -1,0 +1,6 @@
+product_id,product_name,category,list_price
+P-100,Analytics Suite,Software,1200
+P-101,BI Connector,Software,400
+P-102,Data Pipeline Kit,Hardware,800
+P-103,Edge Sensor Pack,Hardware,250
+P-104,Support Plan,Services,150

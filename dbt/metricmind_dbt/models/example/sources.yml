@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: metricmind
+    schema: public
+    tables:
+      - name: geography
+      - name: customers
+      - name: products
+      - name: sales
+      - name: costs

@@ -1,0 +1,49 @@
+version: 2
+
+models:
+  - name: my_first_dbt_model
+    description: "A starter dbt model"
+    columns:
+      - name: id
+        description: "The primary key for this table"
+        data_tests:
+          - unique
+          - not_null
+
+  - name: my_second_dbt_model
+    description: "A starter dbt model"
+    columns:
+      - name: id
+        description: "The primary key for this table"
+        data_tests:
+          - unique
+          - not_null
+
+  - name: fct_sales
+    description: "Business-ready sales fact model"
+    columns:
+      - name: order_id
+        description: "Unique identifier for each sales order"
+        data_tests:
+          - unique
+          - not_null
+
+      - name: customer_id
+        description: "Customer associated with the order"
+        data_tests:
+          - not_null
+
+      - name: product_id
+        description: "Product associated with the order"
+        data_tests:
+          - not_null
+
+      - name: revenue
+        description: "Revenue generated from the sales order"
+        data_tests:
+          - not_null
+
+      - name: margin
+        description: "Revenue minus material and shipping costs"
+        data_tests:
+          - not_null
